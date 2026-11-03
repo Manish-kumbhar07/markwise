@@ -1,0 +1,8 @@
+{
+  "name": "Markwise - Enterprise AI Brand Governance",
+  "description": "Markwise reviews content before it goes live, shows why each issue was flagged, links claims to approved evidence, and turns every human correction into a better, versioned rule.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
