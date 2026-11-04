@@ -6,3 +6,10 @@ coverage/
 *.log
 .env*
 !.env.example
+
+/src/generated/prisma
+.agents/
+.claude/
+.cursor/
+.windsurf/
+skills-lock.json

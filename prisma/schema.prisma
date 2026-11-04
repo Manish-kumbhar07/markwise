@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          String     @id
+  email       String     @unique
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId])
+}
+
+model Workspace {
+  id       String    @id @default(cuid())
+  name     String
+  users    User[]
+  rules    Rule[]
+  facts    Fact[]
+  contents Content[]
+}
+
+model Rule {
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  title       String
+  severity    String
+  type        String
+  definition  String
+  version     Int       @default(1)
+  createdAt   DateTime  @default(now())
+  issues      Issue[]
+
+  @@index([workspaceId])
+}
+
+model Fact {
+  id             String    @id @default(cuid())
+  workspaceId    String
+  workspace      Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  claim          String
+  evidenceSource String
+  expiryDate     DateTime
+  status         String
+
+  @@index([workspaceId])
+}
+
+model Content {
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  title       String
+  bodyText    String
+  status      String
+  issues      Issue[]
+
+  @@index([workspaceId])
+}
+
+model Issue {
+  id          String   @id @default(cuid())
+  contentId   String
+  content     Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  ruleId      String?
+  rule        Rule?    @relation(fields: [ruleId], references: [id], onDelete: SetNull)
+  severity    String
+  explanation String
+  suggestedFix String
+  status      String   @default("OPEN")
+  aiAssisted  Boolean  @default(true)
+
+  @@index([contentId])
+  @@index([ruleId])
+}
