@@ -18,7 +18,17 @@
     "jsx": "react-jsx",
     "paths": {
       "@/*": [
+        "./src/*",
         "./*"
+      ],
+      "next/navigation": [
+        "./src/lib/next-navigation.ts"
+      ],
+      "next/headers": [
+        "./src/lib/next-headers.ts"
+      ],
+      "next/cache": [
+        "./src/lib/next-cache.ts"
       ]
     },
     "allowImportingTsExtensions": true,

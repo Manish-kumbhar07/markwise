@@ -17,11 +17,12 @@ import {
   getSeverityBorderClass,
   getSeverityBadgeColors,
 } from '../../utils/dashboard';
-import { getRules, createRule, deleteRule, DEFAULT_WORKSPACE_ID } from '../../actions/rules';
+import { getRules, createRule, deleteRule } from '../../actions/rules';
 
 export function BrandBrainPage() {
   const [rules, setRules] = useState<RuleCard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   // Form State
   const [title, setTitle] = useState('');
@@ -38,7 +39,7 @@ export function BrandBrainPage() {
     async function loadData() {
       try {
         setIsLoading(true);
-        const data = await getRules(DEFAULT_WORKSPACE_ID);
+        const data = await getRules();
         if (mounted) {
           const mapped: RuleCard[] = data.map((r) => ({
             id: r.id,
@@ -52,6 +53,9 @@ export function BrandBrainPage() {
         }
       } catch (err) {
         console.error('Failed to load rules:', err);
+        if (mounted) {
+          setLoadError(err instanceof Error ? err.message : 'Failed to load rules.');
+        }
       } finally {
         if (mounted) setIsLoading(false);
       }
@@ -83,7 +87,6 @@ export function BrandBrainPage() {
         type,
         severity,
         definition: definition.trim(),
-        workspaceId: DEFAULT_WORKSPACE_ID,
       });
 
       const newCard: RuleCard = {
@@ -115,10 +118,11 @@ export function BrandBrainPage() {
 
   const handleDeleteRule = async (id: string) => {
     try {
-      setRules((prev) => prev.filter((r) => r.id !== id));
       await deleteRule(id);
+      setRules((prev) => prev.filter((r) => r.id !== id));
     } catch (err) {
       console.error('Failed to delete rule:', err);
+      setFormError(err instanceof Error ? err.message : 'Failed to delete rule.');
     }
   };
 
@@ -164,8 +168,6 @@ export function BrandBrainPage() {
           </div>
 
           <form onSubmit={handleCreateRule} className="space-y-4">
-            <input type="hidden" name="workspaceId" value={DEFAULT_WORKSPACE_ID} />
-
             {/* Error Message */}
             {formError && (
               <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2">
@@ -289,7 +291,11 @@ export function BrandBrainPage() {
           {isLoading ? (
             <div className="bg-[#FFFCF6] rounded-2xl border border-[#E8DFD0] p-12 text-center space-y-3">
               <Loader2 className="w-6 h-6 text-[#123B2F] animate-spin mx-auto" />
-              <p className="text-xs text-[#7A8274]">Loading rules from Supabase...</p>
+              <p className="text-xs text-[#7A8274]">Loading rules from the database...</p>
+            </div>
+          ) : loadError ? (
+            <div role="alert" className="bg-red-50 rounded-2xl border border-red-200 p-6 text-sm text-red-800">
+              Could not load rules: {loadError}
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4">

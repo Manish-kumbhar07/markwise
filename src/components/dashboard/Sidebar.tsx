@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import {
   Shield,
   Database,
@@ -5,10 +6,10 @@ import {
   CheckCircle,
   BarChart,
   LogOut,
-  ChevronRight,
   Sparkles,
 } from 'lucide-react';
 import { DashboardPage, NAV_ITEMS } from '../../utils/dashboard';
+import { createClient } from '@/utils/supabase/client';
 
 interface SidebarProps {
   activePage: DashboardPage;
@@ -25,6 +26,27 @@ const ICON_MAP = {
 };
 
 export function Sidebar({ activePage, onSelectPage, onOpenNewReview }: SidebarProps) {
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user?.email) {
+        setUserEmail(user.email);
+      }
+    });
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    window.history.pushState({}, '', '/login');
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  };
+
+  const displayName = userEmail ? userEmail.split('@')[0] : 'Sarah Jenkins';
+  const displayEmail = userEmail || 's.jenkins@markwise.com';
+  const displayInitials = displayName.slice(0, 2).toUpperCase();
+
   return (
     <aside
       className="w-64 h-screen shrink-0 bg-[#123B2F] text-white flex flex-col justify-between sticky top-0 z-30 select-none border-r border-[#123B2F]/80 shadow-md"
@@ -115,22 +137,29 @@ export function Sidebar({ activePage, onSelectPage, onOpenNewReview }: SidebarPr
 
       {/* Bottom User Profile Section */}
       <div className="p-4 border-t border-white/10 bg-[#0e3025]/50">
-        <div className="flex items-center justify-between gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group">
+        <div className="flex items-center justify-between gap-2 p-2 rounded-xl hover:bg-white/5 transition-colors">
           <div className="flex items-center gap-3 min-w-0">
             {/* Circular Avatar with initials */}
-            <div className="w-10 h-10 rounded-full bg-[#F47745] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs ring-2 ring-white/15">
-              SJ
+            <div className="w-9 h-9 rounded-full bg-[#F47745] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs ring-2 ring-white/15">
+              {displayInitials}
             </div>
             <div className="min-w-0 flex-1">
               <div className="text-sm font-semibold text-white truncate font-inter">
-                Sarah Jenkins
+                {displayName}
               </div>
               <div className="text-xs text-white/50 truncate font-mono">
-                s.jenkins@markwise.com
+                {displayEmail}
               </div>
             </div>
           </div>
-          <ChevronRight className="w-4 h-4 text-white/40 group-hover:text-white transition-colors shrink-0" />
+          <button
+            type="button"
+            onClick={handleSignOut}
+            title="Sign Out"
+            className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </aside>

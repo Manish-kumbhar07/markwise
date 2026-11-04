@@ -2,11 +2,12 @@ import { Shield } from 'lucide-react';
 import { ActiveTab } from '../utils/governance';
 
 interface FooterProps {
-  onSelectTab: (tab: ActiveTab) => void;
-  onOpenLogin: () => void;
-  onOpenGetStarted: () => void;
-  onOpenDocs: () => void;
+  onSelectTab?: (tab: ActiveTab) => void;
+  onOpenLogin?: () => void;
+  onOpenGetStarted?: () => void;
+  onOpenDocs?: () => void;
 }
+
 
 export function Footer({
   onSelectTab,
@@ -22,7 +23,7 @@ export function Footer({
           <div className="md:col-span-2 space-y-3">
             <button
               type="button"
-              onClick={() => onSelectTab('loop')}
+              onClick={() => onSelectTab?.('loop')}
               className="flex items-center gap-2.5 text-[#174C3B] text-left cursor-pointer"
             >
               <div className="w-8 h-8 rounded-lg bg-[#174C3B] flex items-center justify-center text-white">
@@ -49,7 +50,7 @@ export function Footer({
               <li>
                 <button
                   type="button"
-                  onClick={() => onSelectTab('loop')}
+                  onClick={() => onSelectTab?.('loop')}
                   className="hover:text-[#174C3B] transition-colors cursor-pointer text-left"
                 >
                   The 10-Step Loop
@@ -58,7 +59,7 @@ export function Footer({
               <li>
                 <button
                   type="button"
-                  onClick={() => onSelectTab('demo')}
+                  onClick={() => onSelectTab?.('demo')}
                   className="hover:text-[#174C3B] transition-colors cursor-pointer text-left"
                 >
                   Live Governance Inspector
@@ -67,7 +68,7 @@ export function Footer({
               <li>
                 <button
                   type="button"
-                  onClick={() => onSelectTab('features')}
+                  onClick={() => onSelectTab?.('features')}
                   className="hover:text-[#174C3B] transition-colors cursor-pointer text-left"
                 >
                   Enterprise Features
@@ -76,7 +77,7 @@ export function Footer({
               <li>
                 <button
                   type="button"
-                  onClick={() => onSelectTab('pricing')}
+                  onClick={() => onSelectTab?.('pricing')}
                   className="hover:text-[#174C3B] transition-colors cursor-pointer text-left"
                 >
                   Enterprise Pricing

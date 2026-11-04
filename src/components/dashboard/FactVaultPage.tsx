@@ -23,11 +23,12 @@ import {
   TableCell,
 } from '../ui/table';
 import { type FactRecord } from '../../utils/dashboard';
-import { getFacts, createFact, deleteFact, DEFAULT_WORKSPACE_ID } from '../../actions/facts';
+import { getFacts, createFact, deleteFact } from '../../actions/facts';
 
 export function FactVaultPage() {
   const [facts, setFacts] = useState<FactRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
@@ -45,7 +46,7 @@ export function FactVaultPage() {
     async function loadData() {
       try {
         setIsLoading(true);
-        const data = await getFacts(DEFAULT_WORKSPACE_ID);
+        const data = await getFacts();
         if (mounted) {
           const mapped: FactRecord[] = data.map((f) => ({
             id: f.id,
@@ -58,6 +59,9 @@ export function FactVaultPage() {
         }
       } catch (err) {
         console.error('Failed to load facts:', err);
+        if (mounted) {
+          setLoadError(err instanceof Error ? err.message : 'Failed to load facts.');
+        }
       } finally {
         if (mounted) setIsLoading(false);
       }
@@ -90,9 +94,8 @@ export function FactVaultPage() {
       const created = await createFact({
         claim: newClaim.trim(),
         evidenceSource: newSource.trim(),
-        expiryDate: new Date(newExpiry),
+        expiryDate: newExpiry,
         status: newStatus,
-        workspaceId: DEFAULT_WORKSPACE_ID,
       });
 
       const newRecord: FactRecord = {
@@ -119,10 +122,11 @@ export function FactVaultPage() {
 
   const handleDeleteFact = async (id: string) => {
     try {
-      setFacts((prev) => prev.filter((f) => f.id !== id));
       await deleteFact(id);
+      setFacts((prev) => prev.filter((f) => f.id !== id));
     } catch (err) {
       console.error('Failed to delete fact:', err);
+      setLoadError(err instanceof Error ? err.message : 'Failed to delete fact.');
     }
   };
 
@@ -185,10 +189,15 @@ export function FactVaultPage() {
         </div>
 
         {/* Facts Table */}
+        {loadError && (
+          <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-800">
+            Could not load facts: {loadError}
+          </div>
+        )}
         {isLoading ? (
           <div className="py-16 text-center space-y-3">
             <Loader2 className="w-6 h-6 text-[#123B2F] animate-spin mx-auto" />
-            <p className="text-xs text-[#7A8274]">Loading facts from Supabase database...</p>
+            <p className="text-xs text-[#7A8274]">Loading facts from the database...</p>
           </div>
         ) : (
           <div className="rounded-xl border border-[#E8DFD0] overflow-hidden">
@@ -288,8 +297,6 @@ export function FactVaultPage() {
             </div>
 
             <form onSubmit={handleAddFact} className="space-y-4">
-              <input type="hidden" name="workspaceId" value={DEFAULT_WORKSPACE_ID} />
-
               {modalError && (
                 <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />

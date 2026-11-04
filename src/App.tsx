@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import type { Session } from '@supabase/supabase-js';
 import { GlobalDashboardLayout } from './components/dashboard/GlobalDashboardLayout';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
@@ -15,114 +16,151 @@ import { EnterpriseTrust } from './components/EnterpriseTrust';
 import { Footer } from './components/Footer';
 import { BackgroundDecoration } from './components/BackgroundDecoration';
 import { GetStartedModal } from './components/modals/GetStartedModal';
-import { LoginModal } from './components/modals/LoginModal';
 import { DocsModal } from './components/modals/DocsModal';
+import LoginPage from './app/login/page';
+import { createClient } from '@/utils/supabase/client';
 import { ActiveTab } from './utils/governance';
-import { LayoutDashboard, Globe } from 'lucide-react';
+import { DashboardPage } from './utils/dashboard';
 
 export default function App() {
-  // 'dashboard' is the active primary layout requested by user
-  const [appMode, setAppMode] = useState<'dashboard' | 'landing'>('dashboard');
+  const [currentPath, setCurrentPath] = useState<string>(() =>
+    typeof window !== 'undefined' ? window.location.pathname : '/'
+  );
+  const [session, setSession] = useState<Session | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+
   const [activeLandingTab, setActiveLandingTab] = useState<ActiveTab>('loop');
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isGetStartedOpen, setIsGetStartedOpen] = useState(false);
   const [isDocsOpen, setIsDocsOpen] = useState(false);
 
+  const supabase = createClient();
+
+  useEffect(() => {
+    // 1. Initial session check
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setAuthChecked(true);
+    });
+
+    // 2. Real-time auth state subscription
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
+      setAuthChecked(true);
+    });
+
+    // 3. Browser location popstate listener
+    const handleLocationChange = () => {
+      setCurrentPath(window.location.pathname);
+    };
+
+    window.addEventListener('popstate', handleLocationChange);
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener('popstate', handleLocationChange);
+    };
+  }, []);
+
+  // Strict route protection & redirection (matching src/middleware.ts)
+  useEffect(() => {
+    if (!authChecked) return;
+
+    // 1. If unauthenticated and accessing protected /dashboard routes -> redirect to /login
+    if (!session && (currentPath === '/dashboard' || currentPath.startsWith('/dashboard/'))) {
+      window.history.replaceState({}, '', '/login');
+      setCurrentPath('/login');
+    }
+
+    // 2. If authenticated and visiting /login or / -> redirect to /dashboard/rules
+    if (session && (currentPath === '/login' || currentPath === '/')) {
+      window.history.replaceState({}, '', '/dashboard/rules');
+      setCurrentPath('/dashboard/rules');
+    }
+  }, [authChecked, session, currentPath]);
+
+  const navigate = (path: string) => {
+    window.history.pushState({}, '', path);
+    setCurrentPath(path);
+  };
+
+  // Determine initial dashboard tab based on URL path
+  const getDashboardInitialPage = (): DashboardPage => {
+    if (currentPath === '/dashboard/facts') return 'fact-vault';
+    if (currentPath === '/dashboard/rules') return 'brand-brain';
+    if (currentPath === '/dashboard/review') return 'review';
+    return 'brand-brain';
+  };
+
+  // Dedicated Login Route
+  if (currentPath === '/login') {
+    return <LoginPage />;
+  }
+
+  // Protected Dashboard Route
+  if (currentPath.startsWith('/dashboard')) {
+    return (
+      <GlobalDashboardLayout
+        initialPage={getDashboardInitialPage()}
+        onSelectPublicSite={() => navigate('/')}
+      />
+    );
+  }
+
+  // Public Landing Page (/)
   return (
-    <div className="min-h-screen bg-[#F7F2E8] text-[#242820] font-inter">
-      {/* View Mode Banner / Quick Switcher */}
-      <div className="fixed bottom-4 right-4 z-50">
-        <div className="flex items-center gap-1.5 p-1 rounded-full bg-[#123B2F] text-white shadow-xl border border-white/20 text-xs font-semibold backdrop-blur-md">
-          <button
-            type="button"
-            onClick={() => setAppMode('dashboard')}
-            className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-colors cursor-pointer ${
-              appMode === 'dashboard'
-                ? 'bg-[#F47745] text-white'
-                : 'text-white/70 hover:text-white'
-            }`}
-          >
-            <LayoutDashboard className="w-3.5 h-3.5" />
-            <span>Global Dashboard</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setAppMode('landing')}
-            className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-colors cursor-pointer ${
-              appMode === 'landing'
-                ? 'bg-[#F47745] text-white'
-                : 'text-white/70 hover:text-white'
-            }`}
-          >
-            <Globe className="w-3.5 h-3.5" />
-            <span>Public Site & Loop</span>
-          </button>
-        </div>
-      </div>
+    <div className="min-h-screen bg-[#F7F2E8] text-[#242820] relative flex flex-col font-inter selection:bg-[#F47745]/20 selection:text-[#174C3B]">
+      <BackgroundDecoration />
+      <Navbar
+        activeTab={activeLandingTab}
+        onSelectTab={setActiveLandingTab}
+        onOpenLogin={() => navigate('/login')}
+        onOpenGetStarted={() => setIsGetStartedOpen(true)}
+      />
 
-      {/* PRIMARY REQUESTED LAYOUT: Global Dashboard Layout */}
-      {appMode === 'dashboard' ? (
-        <GlobalDashboardLayout
-          initialPage="brand-brain"
-          onSelectPublicSite={() => setAppMode('landing')}
-        />
-      ) : (
-        /* PUBLIC LANDING & THE LOOP VIEW */
-        <div className="min-h-screen bg-[#F7F2E8] text-[#242820] relative flex flex-col font-inter selection:bg-[#F47745]/20 selection:text-[#174C3B]">
-          <BackgroundDecoration />
-          <Navbar
-            activeTab={activeLandingTab}
-            onSelectTab={setActiveLandingTab}
-            onOpenLogin={() => setIsLoginOpen(true)}
-            onOpenGetStarted={() => setIsGetStartedOpen(true)}
-          />
+      <main className="flex-1">
+        {activeLandingTab === 'loop' && (
+          <div className="animate-in fade-in duration-200">
+            <HeroSection
+              onOpenGetStarted={() => setIsGetStartedOpen(true)}
+              onOpenDocs={() => setIsDocsOpen(true)}
+            />
+            <TheLoopSection />
+          </div>
+        )}
 
-          <main className="flex-1">
-            {activeLandingTab === 'loop' && (
-              <div className="animate-in fade-in duration-200">
-                <HeroSection
-                  onOpenGetStarted={() => setIsGetStartedOpen(true)}
-                  onOpenDocs={() => setIsDocsOpen(true)}
-                />
-                <TheLoopSection />
-              </div>
-            )}
+        {activeLandingTab === 'demo' && (
+          <div className="animate-in fade-in duration-200">
+            <LiveInspector />
+          </div>
+        )}
 
-            {activeLandingTab === 'demo' && (
-              <div className="animate-in fade-in duration-200">
-                <LiveInspector />
-              </div>
-            )}
+        {activeLandingTab === 'features' && (
+          <div className="animate-in fade-in duration-200">
+            <FeaturesSection />
+            <EnterpriseTrust />
+          </div>
+        )}
 
-            {activeLandingTab === 'features' && (
-              <div className="animate-in fade-in duration-200">
-                <FeaturesSection />
-                <EnterpriseTrust />
-              </div>
-            )}
+        {activeLandingTab === 'pricing' && (
+          <div className="animate-in fade-in duration-200">
+            <PricingSection onOpenGetStarted={() => setIsGetStartedOpen(true)} />
+          </div>
+        )}
+      </main>
 
-            {activeLandingTab === 'pricing' && (
-              <div className="animate-in fade-in duration-200">
-                <PricingSection onOpenGetStarted={() => setIsGetStartedOpen(true)} />
-              </div>
-            )}
-          </main>
+      <Footer
+        onSelectTab={setActiveLandingTab}
+        onOpenLogin={() => navigate('/login')}
+        onOpenGetStarted={() => setIsGetStartedOpen(true)}
+        onOpenDocs={() => setIsDocsOpen(true)}
+      />
 
-          <Footer
-            onSelectTab={setActiveLandingTab}
-            onOpenLogin={() => setIsLoginOpen(true)}
-            onOpenGetStarted={() => setIsGetStartedOpen(true)}
-            onOpenDocs={() => setIsDocsOpen(true)}
-          />
-
-          <GetStartedModal
-            isOpen={isGetStartedOpen}
-            onClose={() => setIsGetStartedOpen(false)}
-          />
-          <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
-          <DocsModal isOpen={isDocsOpen} onClose={() => setIsDocsOpen(false)} />
-        </div>
-      )}
+      <GetStartedModal
+        isOpen={isGetStartedOpen}
+        onClose={() => setIsGetStartedOpen(false)}
+      />
+      <DocsModal isOpen={isDocsOpen} onClose={() => setIsDocsOpen(false)} />
     </div>
   );
 }

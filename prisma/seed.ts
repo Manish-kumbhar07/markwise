@@ -3,15 +3,24 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export async function main() {
-  const wsId = 'ws_markwise_default';
+  const wsId = 'demo-workspace';
 
-  // Ensure default workspace exists
+  // Create the workspace before its demo user because the user references it.
   await prisma.workspace.upsert({
     where: { id: wsId },
     update: {},
     create: {
       id: wsId,
-      name: 'Markwise Enterprise',
+      name: 'Demo Workspace',
+    },
+  });
+  await prisma.user.upsert({
+    where: { email: 'demo@markwise.ai' },
+    update: { workspaceId: wsId },
+    create: {
+      id: 'demo-user-1',
+      email: 'demo@markwise.ai',
+      workspaceId: wsId,
     },
   });
 
@@ -52,7 +61,7 @@ export async function main() {
         },
       ],
     });
-    console.log('Seeded initial rules to Supabase');
+    console.log('Seeded initial rules to the database');
   }
 
   // Seed Facts
@@ -87,7 +96,7 @@ export async function main() {
         },
       ],
     });
-    console.log('Seeded initial facts to Supabase');
+    console.log('Seeded initial facts to the database');
   }
 }
 
@@ -100,4 +109,3 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
-

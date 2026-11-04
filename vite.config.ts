@@ -1,15 +1,71 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import {defineConfig} from 'vite';
+import dotenv from 'dotenv';
+import { defineConfig, type Plugin } from 'vite';
+import { apiHandler } from './src/server/api.ts';
+
+dotenv.config();
+dotenv.config({ path: '.env.local', override: true });
+
+function databaseApiPlugin(): Plugin {
+  return {
+    name: 'markwise-database-api',
+    configureServer(server) {
+      server.middlewares.use(apiHandler);
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(apiHandler);
+    },
+  };
+}
 
 export default defineConfig(() => {
+  const supabaseUrl = (
+    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://txhwkaesmhntloiwiuzo.supabase.co'
+  ).replace(/^["']|["']$/g, '').trim();
+
+  const supabaseAnonKey = (
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    ''
+  ).replace(/^["']|["']$/g, '').trim();
+
+  const supabasePublishableKey = (
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || ''
+  ).replace(/^["']|["']$/g, '').trim();
+
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [databaseApiPlugin(), react(), tailwindcss()],
     resolve: {
-      alias: {
-        '@': path.resolve(__dirname, '.'),
-      },
+      alias: [
+        {
+          find: 'next/navigation',
+          replacement: path.resolve(import.meta.dirname, 'src/lib/next-navigation.ts'),
+        },
+        {
+          find: 'next/headers',
+          replacement: path.resolve(import.meta.dirname, 'src/lib/next-headers.ts'),
+        },
+        {
+          find: 'next/cache',
+          replacement: path.resolve(import.meta.dirname, 'src/lib/next-cache.ts'),
+        },
+        {
+          find: /^@\/(.*)/,
+          replacement: path.resolve(import.meta.dirname, 'src/$1'),
+        },
+        {
+          find: '@',
+          replacement: path.resolve(import.meta.dirname, 'src'),
+        },
+      ],
+    },
+    define: {
+      'process.env.NEXT_PUBLIC_SUPABASE_URL': JSON.stringify(supabaseUrl),
+      'process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY': JSON.stringify(supabaseAnonKey),
+      'process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY': JSON.stringify(supabasePublishableKey),
+      'process.env': JSON.stringify(process.env),
     },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
