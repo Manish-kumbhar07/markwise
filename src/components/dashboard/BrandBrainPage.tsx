@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Shield,
   Plus,
@@ -8,18 +8,20 @@ import {
   Sparkles,
   Info,
   Trash2,
+  Loader2,
 } from 'lucide-react';
 import {
   type RuleCard,
   type RuleType,
   type RuleSeverity,
-  INITIAL_MOCK_RULES,
   getSeverityBorderClass,
   getSeverityBadgeColors,
 } from '../../utils/dashboard';
+import { getRules, createRule, deleteRule, DEFAULT_WORKSPACE_ID } from '../../actions/rules';
 
 export function BrandBrainPage() {
-  const [rules, setRules] = useState<RuleCard[]>(INITIAL_MOCK_RULES);
+  const [rules, setRules] = useState<RuleCard[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Form State
   const [title, setTitle] = useState('');
@@ -28,8 +30,39 @@ export function BrandBrainPage() {
   const [definition, setDefinition] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleCreateRule = (e: React.FormEvent) => {
+  // Load rules from database
+  useEffect(() => {
+    let mounted = true;
+    async function loadData() {
+      try {
+        setIsLoading(true);
+        const data = await getRules(DEFAULT_WORKSPACE_ID);
+        if (mounted) {
+          const mapped: RuleCard[] = data.map((r) => ({
+            id: r.id,
+            title: r.title,
+            type: (r.type as RuleType) || 'CLAIM',
+            severity: (r.severity as RuleSeverity) || 'HIGH',
+            definition: r.definition,
+            createdAt: `Active · v${r.version}`,
+          }));
+          setRules(mapped);
+        }
+      } catch (err) {
+        console.error('Failed to load rules:', err);
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    }
+    loadData();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const handleCreateRule = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!title.trim()) {
@@ -41,33 +74,52 @@ export function BrandBrainPage() {
       return;
     }
 
-    const nextIndex = rules.length + 15;
-    const formattedId = `BR-0${nextIndex} v1`;
+    try {
+      setIsSubmitting(true);
+      setFormError(null);
 
-    const newRule: RuleCard = {
-      id: formattedId,
-      title: title.trim(),
-      type,
-      severity,
-      definition: definition.trim(),
-      createdAt: 'Just now · v1.0',
-    };
+      const created = await createRule({
+        title: title.trim(),
+        type,
+        severity,
+        definition: definition.trim(),
+        workspaceId: DEFAULT_WORKSPACE_ID,
+      });
 
-    setRules([newRule, ...rules]);
-    setTitle('');
-    setType('CLAIM');
-    setSeverity('HIGH');
-    setDefinition('');
-    setFormError(null);
-    setSuccessMessage(`Rule ${formattedId} committed to Brand Brain!`);
+      const newCard: RuleCard = {
+        id: created.id,
+        title: created.title,
+        type: (created.type as RuleType) || type,
+        severity: (created.severity as RuleSeverity) || severity,
+        definition: created.definition,
+        createdAt: `Active · v${created.version}`,
+      };
 
-    setTimeout(() => {
-      setSuccessMessage(null);
-    }, 4000);
+      setRules((prev) => [newCard, ...prev]);
+      setTitle('');
+      setType('CLAIM');
+      setSeverity('HIGH');
+      setDefinition('');
+      setSuccessMessage(`Rule "${created.title}" successfully committed to database!`);
+
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 4000);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to create rule';
+      setFormError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleDeleteRule = (id: string) => {
-    setRules(rules.filter((r) => r.id !== id));
+  const handleDeleteRule = async (id: string) => {
+    try {
+      setRules((prev) => prev.filter((r) => r.id !== id));
+      await deleteRule(id);
+    } catch (err) {
+      console.error('Failed to delete rule:', err);
+    }
   };
 
   return (
@@ -98,265 +150,217 @@ export function BrandBrainPage() {
       {/* Main Two-Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* LEFT COLUMN (1/3 width): Create Rule Form */}
-        <div className="lg:col-span-1">
-          <div className="bg-[#FFFCF6] rounded-2xl border border-[#E8DFD0] p-6 shadow-xs sticky top-24">
-            <div className="flex items-center justify-between pb-4 border-b border-[#E8DFD0]/60 mb-5">
-              <div>
-                <h2 className="text-lg font-bold text-[#242820] font-inter">
-                  Create New Rule
-                </h2>
-                <p className="text-xs text-[#7A8274] mt-0.5">
-                  Codify a new invariant for review pipelines
-                </p>
-              </div>
-              <span className="w-7 h-7 rounded-lg bg-[#123B2F]/10 text-[#123B2F] flex items-center justify-center">
-                <Plus className="w-4 h-4" />
-              </span>
+        <div className="lg:col-span-1 bg-[#FFFCF6] rounded-2xl border border-[#E8DFD0] p-6 shadow-xs sticky top-24">
+          <div className="flex items-center gap-2 pb-4 border-b border-[#E8DFD0]/70 mb-5">
+            <div className="p-2 rounded-xl bg-[#123B2F] text-[#F7F2E8]">
+              <Plus className="w-4 h-4" />
             </div>
+            <div>
+              <h2 className="text-base font-bold text-[#242820] font-inter">
+                Create Governance Rule
+              </h2>
+              <p className="text-xs text-[#545B4E]">Commit a constraint to live enforcement</p>
+            </div>
+          </div>
 
+          <form onSubmit={handleCreateRule} className="space-y-4">
+            <input type="hidden" name="workspaceId" value={DEFAULT_WORKSPACE_ID} />
+
+            {/* Error Message */}
             {formError && (
-              <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 shrink-0 text-red-500" />
+              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
                 <span>{formError}</span>
               </div>
             )}
 
+            {/* Success Message */}
             {successMessage && (
-              <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center gap-2 animate-in fade-in">
-                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                 <span>{successMessage}</span>
               </div>
             )}
 
-            <form onSubmit={handleCreateRule} className="space-y-4">
-              {/* Title Input */}
+            {/* Rule Title */}
+            <div className="space-y-1.5">
+              <label htmlFor="rule-title" className="block text-xs font-semibold text-[#123B2F]">
+                Rule Title
+              </label>
+              <input
+                id="rule-title"
+                name="title"
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. Absolute Security & Guarantee Claims"
+                className="w-full text-xs px-3 py-2.5 rounded-xl border border-[#E8DFD0] bg-[#F7F2E8]/40 text-[#242820] focus:outline-hidden focus:ring-2 focus:ring-[#123B2F] focus:border-transparent transition-all placeholder:text-[#7A8274]"
+              />
+            </div>
+
+            {/* Type & Severity Grid */}
+            <div className="grid grid-cols-2 gap-3">
+              {/* Rule Type */}
               <div className="space-y-1.5">
-                <label
-                  htmlFor="rule-title"
-                  className="block text-xs font-semibold text-[#242820] uppercase tracking-wider font-mono"
-                >
-                  Title
+                <label htmlFor="rule-type" className="block text-xs font-semibold text-[#123B2F]">
+                  Rule Type
                 </label>
-                <input
-                  id="rule-title"
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. Unqualified Zero-Fee Guarantee"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E8DFD0] bg-[#F7F2E8] text-sm text-[#242820] placeholder-[#7A8274]/60 focus:outline-none focus:border-[#123B2F] focus:ring-1 focus:ring-[#123B2F] transition-all"
-                />
+                <select
+                  id="rule-type"
+                  name="type"
+                  value={type}
+                  onChange={(e) => setType(e.target.value as RuleType)}
+                  className="w-full text-xs px-3 py-2.5 rounded-xl border border-[#E8DFD0] bg-[#F7F2E8]/40 text-[#242820] focus:outline-hidden focus:ring-2 focus:ring-[#123B2F] focus:border-transparent transition-all cursor-pointer font-medium"
+                >
+                  <option value="CLAIM">Claim Invariant</option>
+                  <option value="TONE">Tone / Voice</option>
+                  <option value="BANNED_WORD">Banned Word</option>
+                </select>
               </div>
 
-              {/* Type Select */}
+              {/* Severity Level */}
               <div className="space-y-1.5">
-                <label
-                  htmlFor="rule-type"
-                  className="block text-xs font-semibold text-[#242820] uppercase tracking-wider font-mono"
-                >
-                  Type
-                </label>
-                <div className="relative">
-                  <select
-                    id="rule-type"
-                    value={type}
-                    onChange={(e) => setType(e.target.value as RuleType)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E8DFD0] bg-[#F7F2E8] text-sm text-[#242820] font-medium appearance-none focus:outline-none focus:border-[#123B2F] focus:ring-1 focus:ring-[#123B2F] cursor-pointer"
-                  >
-                    <option value="BANNED_WORD">BANNED_WORD</option>
-                    <option value="TONE">TONE</option>
-                    <option value="CLAIM">CLAIM</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-[#545B4E]">
-                    <SlidersHorizontal className="w-3.5 h-3.5" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Severity Select */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="rule-severity"
-                  className="block text-xs font-semibold text-[#242820] uppercase tracking-wider font-mono"
-                >
+                <label htmlFor="rule-severity" className="block text-xs font-semibold text-[#123B2F]">
                   Severity
                 </label>
-                <div className="relative">
-                  <select
-                    id="rule-severity"
-                    value={severity}
-                    onChange={(e) => setSeverity(e.target.value as RuleSeverity)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E8DFD0] bg-[#F7F2E8] text-sm text-[#242820] font-medium appearance-none focus:outline-none focus:border-[#123B2F] focus:ring-1 focus:ring-[#123B2F] cursor-pointer"
-                  >
-                    <option value="HIGH">HIGH (Blocking)</option>
-                    <option value="MEDIUM">MEDIUM (Warning)</option>
-                    <option value="LOW">LOW (Advisory)</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-[#545B4E]">
-                    <div
-                      className={`w-2.5 h-2.5 rounded-full ${
-                        severity === 'HIGH'
-                          ? 'bg-red-500'
-                          : severity === 'MEDIUM'
-                          ? 'bg-amber-500'
-                          : 'bg-stone-400'
-                      }`}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Definition Textarea */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="rule-definition"
-                  className="block text-xs font-semibold text-[#242820] uppercase tracking-wider font-mono"
+                <select
+                  id="rule-severity"
+                  name="severity"
+                  value={severity}
+                  onChange={(e) => setSeverity(e.target.value as RuleSeverity)}
+                  className="w-full text-xs px-3 py-2.5 rounded-xl border border-[#E8DFD0] bg-[#F7F2E8]/40 text-[#242820] focus:outline-hidden focus:ring-2 focus:ring-[#123B2F] focus:border-transparent transition-all cursor-pointer font-medium"
                 >
-                  Definition
-                </label>
-                <textarea
-                  id="rule-definition"
-                  rows={4}
-                  value={definition}
-                  onChange={(e) => setDefinition(e.target.value)}
-                  placeholder="Specify the exact enforcement condition, banned phrases, or required substantiation criteria..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E8DFD0] bg-[#F7F2E8] text-sm text-[#242820] placeholder-[#7A8274]/60 focus:outline-none focus:border-[#123B2F] focus:ring-1 focus:ring-[#123B2F] transition-all resize-none leading-relaxed"
-                />
+                  <option value="HIGH">High (Hard Gate)</option>
+                  <option value="MEDIUM">Medium (Warn)</option>
+                  <option value="LOW">Low (Advisory)</option>
+                </select>
               </div>
-
-              {/* Submit Button (Coral Orange, Full Width) */}
-              <button
-                type="submit"
-                className="w-full bg-[#F47745] hover:bg-[#e06634] active:bg-[#c85527] text-white font-semibold py-3 px-4 rounded-xl shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-2 mt-2"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Create Rule</span>
-              </button>
-            </form>
-
-            {/* Helper note */}
-            <div className="mt-5 pt-4 border-t border-[#E8DFD0]/60 flex items-start gap-2 text-[11px] text-[#7A8274]">
-              <Info className="w-3.5 h-3.5 shrink-0 text-[#123B2F] mt-0.5" />
-              <span>
-                New rules automatically compile to AST patterns and sync across the active review queue.
-              </span>
             </div>
-          </div>
+
+            {/* Definition */}
+            <div className="space-y-1.5">
+              <label htmlFor="rule-definition" className="block text-xs font-semibold text-[#123B2F]">
+                Definition & Enforcement Scope
+              </label>
+              <textarea
+                id="rule-definition"
+                name="definition"
+                rows={4}
+                value={definition}
+                onChange={(e) => setDefinition(e.target.value)}
+                placeholder="Explicitly define what is prohibited or mandated, exceptions, and required citations..."
+                className="w-full text-xs px-3 py-2.5 rounded-xl border border-[#E8DFD0] bg-[#F7F2E8]/40 text-[#242820] focus:outline-hidden focus:ring-2 focus:ring-[#123B2F] focus:border-transparent transition-all placeholder:text-[#7A8274] resize-none leading-relaxed"
+              />
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full mt-2 py-3 px-4 rounded-xl bg-[#123B2F] text-[#F7F2E8] font-inter font-semibold text-xs hover:bg-[#1b5343] active:bg-[#0c2921] transition-all duration-150 flex items-center justify-center gap-2 shadow-sm cursor-pointer disabled:opacity-50"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Saving to Database...</span>
+                </>
+              ) : (
+                <>
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Commit Rule to Codex</span>
+                </>
+              )}
+            </button>
+          </form>
         </div>
 
-        {/* RIGHT COLUMN (2/3 width): Active Rules List */}
+        {/* RIGHT COLUMN (2/3 width): Rules List */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-[#242820] font-inter">
-                Active Rules
-              </h2>
-              <p className="text-xs text-[#7A8274] mt-0.5">
-                Enforcing corporate tone, regulatory compliance, and factual proof
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-mono text-[#7A8274]">
-                Legend:
-              </span>
-              <span className="inline-flex items-center gap-1 text-[11px] text-red-700 font-medium">
-                <span className="w-2 h-2 rounded-full bg-red-500" />
-                High
-              </span>
-              <span className="inline-flex items-center gap-1 text-[11px] text-amber-700 font-medium">
-                <span className="w-2 h-2 rounded-full bg-amber-500" />
-                Medium
-              </span>
-              <span className="inline-flex items-center gap-1 text-[11px] text-stone-600 font-medium">
-                <span className="w-2 h-2 rounded-full bg-stone-400" />
-                Low
-              </span>
-            </div>
+          <div className="flex items-center justify-between px-1">
+            <h3 className="text-sm font-bold text-[#123B2F] uppercase tracking-wider font-mono">
+              Enforced Codex Registry
+            </h3>
+            <span className="text-xs text-[#7A8274] flex items-center gap-1 font-mono">
+              <SlidersHorizontal className="w-3 h-3" />
+              Showing all active rules
+            </span>
           </div>
 
-          {/* Cards List */}
-          <div className="space-y-4">
-            {rules.map((rule) => {
-              const borderClass = getSeverityBorderClass(rule.severity);
-              const badgeColors = getSeverityBadgeColors(rule.severity);
+          {isLoading ? (
+            <div className="bg-[#FFFCF6] rounded-2xl border border-[#E8DFD0] p-12 text-center space-y-3">
+              <Loader2 className="w-6 h-6 text-[#123B2F] animate-spin mx-auto" />
+              <p className="text-xs text-[#7A8274]">Loading rules from Supabase...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4">
+              {rules.map((rule) => {
+                const borderClass = getSeverityBorderClass(rule.severity);
+                const badgeColors = getSeverityBadgeColors(rule.severity);
 
-              return (
-                <div
-                  key={rule.id}
-                  className={`bg-[#FFFCF6] rounded-2xl border border-[#E8DFD0] ${borderClass} border-l-4 p-6 shadow-xs hover:shadow-sm transition-all duration-150 space-y-3.5 group`}
-                >
-                  {/* Card Header */}
-                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2.5 flex-wrap">
-                        {/* Rule ID in JetBrains Mono */}
-                        <span className="font-mono text-xs font-bold text-[#123B2F] bg-[#123B2F]/10 px-2.5 py-0.5 rounded-md border border-[#123B2F]/15">
-                          {rule.id}
-                        </span>
-
-                        {/* Severity Badge */}
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${badgeColors.bg} ${badgeColors.text} ${badgeColors.border}`}
-                        >
-                          <span className={`w-1.5 h-1.5 rounded-full ${badgeColors.dot}`} />
-                          {rule.severity}
-                        </span>
-
-                        {/* Type Tag */}
-                        <span className="font-mono text-[11px] font-semibold text-[#7A8274] uppercase tracking-wider bg-[#F7F2E8] px-2 py-0.5 rounded border border-[#E8DFD0]">
-                          {rule.type}
-                        </span>
+                return (
+                  <div
+                    key={rule.id}
+                    className={`bg-[#FFFCF6] rounded-2xl border border-[#E8DFD0] p-6 shadow-xs border-l-4 ${borderClass} space-y-4 hover:border-[#123B2F]/30 transition-all duration-200 group`}
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E8DFD0]/40 pb-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`font-mono text-[11px] font-bold px-2 py-0.5 rounded-md border flex items-center gap-1.5 ${badgeColors.bg} ${badgeColors.text} ${badgeColors.border}`}
+                          >
+                            <span className={`w-1.5 h-1.5 rounded-full ${badgeColors.dot}`} />
+                            {rule.severity}
+                          </span>
+                          <span className="font-mono text-[11px] font-semibold text-[#7A8274] uppercase tracking-wider bg-[#F7F2E8] px-2 py-0.5 rounded border border-[#E8DFD0]">
+                            {rule.type}
+                          </span>
+                        </div>
+                        <h3 className="text-base font-bold text-[#242820] font-inter pt-1">
+                          {rule.title}
+                        </h3>
                       </div>
 
-                      {/* Rule Title */}
-                      <h3 className="text-base font-bold text-[#242820] font-inter pt-1">
-                        {rule.title}
-                      </h3>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteRule(rule.id)}
+                        title="Archive Rule"
+                        className="text-[#7A8274] hover:text-red-600 p-1 rounded-lg hover:bg-red-50 transition-colors opacity-60 group-hover:opacity-100 self-end sm:self-auto cursor-pointer"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
 
-                    {/* Delete action */}
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteRule(rule.id)}
-                      title="Archive Rule"
-                      className="text-[#7A8274] hover:text-red-600 p-1 rounded-lg hover:bg-red-50 transition-colors opacity-60 group-hover:opacity-100 self-end sm:self-auto cursor-pointer"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+                    <div className="bg-[#F7F2E8]/70 rounded-xl p-4 border border-[#E8DFD0]/70 text-xs text-[#545B4E] leading-relaxed">
+                      <span className="font-mono font-semibold text-[#123B2F] block mb-1 text-[11px] uppercase tracking-wider">
+                        Definition & Scope:
+                      </span>
+                      <p className="text-sm font-normal text-[#242820]">
+                        {rule.definition}
+                      </p>
+                    </div>
 
-                  {/* Definition Box */}
-                  <div className="bg-[#F7F2E8]/70 rounded-xl p-4 border border-[#E8DFD0]/70 text-xs text-[#545B4E] leading-relaxed">
-                    <span className="font-mono font-semibold text-[#123B2F] block mb-1 text-[11px] uppercase tracking-wider">
-                      Definition & Scope:
-                    </span>
-                    <p className="text-sm font-normal text-[#242820]">
-                      {rule.definition}
-                    </p>
+                    <div className="flex items-center justify-between pt-1 text-[11px] text-[#7A8274] font-mono">
+                      <span className="flex items-center gap-1.5">
+                        <Sparkles className="w-3 h-3 text-[#F47745]" />
+                        Auto-evaluates against live content
+                      </span>
+                      <span>{rule.createdAt || 'Active · v1.0'}</span>
+                    </div>
                   </div>
+                );
+              })}
 
-                  {/* Card Meta Footer */}
-                  <div className="flex items-center justify-between pt-1 text-[11px] text-[#7A8274] font-mono">
-                    <span className="flex items-center gap-1.5">
-                      <Sparkles className="w-3 h-3 text-[#F47745]" />
-                      Auto-evaluates against live content
-                    </span>
-                    <span>{rule.createdAt || 'Active · v1.0'}</span>
-                  </div>
+              {rules.length === 0 && (
+                <div className="bg-[#FFFCF6] rounded-2xl border border-dashed border-[#E8DFD0] p-12 text-center space-y-3">
+                  <Shield className="w-8 h-8 text-[#7A8274] mx-auto" />
+                  <h4 className="text-sm font-bold text-[#242820]">No Active Rules</h4>
+                  <p className="text-xs text-[#7A8274]">
+                    Use the form on the left to create your first brand governance rule.
+                  </p>
                 </div>
-              );
-            })}
-
-            {rules.length === 0 && (
-              <div className="bg-[#FFFCF6] rounded-2xl border border-dashed border-[#E8DFD0] p-12 text-center space-y-3">
-                <Shield className="w-8 h-8 text-[#7A8274] mx-auto" />
-                <h4 className="text-sm font-bold text-[#242820]">No Active Rules</h4>
-                <p className="text-xs text-[#7A8274]">
-                  Use the form on the left to create your first brand governance rule.
-                </p>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
