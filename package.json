@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
-    "@prisma/client": "^7.10.1",
+    "@prisma/client": "^6.19.3",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.118.0",
     "@tailwindcss/vite": "^4.3.3",
@@ -32,7 +32,7 @@
     "@types/react-dom": "^19.3.0",
     "autoprefixer": "^10.4.21",
     "esbuild": "^0.28.0",
-    "prisma": "^7.10.1",
+    "prisma": "^6.19.3",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",
     "typescript": "^7.0.2"
