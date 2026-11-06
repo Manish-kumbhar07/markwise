@@ -63,8 +63,10 @@ export function BrandBrainPage() {
       }
     }
     loadData();
+    window.addEventListener('workspace-changed', loadData);
     return () => {
       mounted = false;
+      window.removeEventListener('workspace-changed', loadData);
     };
   }, []);
 
@@ -369,9 +371,9 @@ export function BrandBrainPage() {
               {rules.length === 0 && (
                 <div className="bg-[#FFFCF6] rounded-2xl border border-dashed border-[#E8DFD0] p-12 text-center space-y-3">
                   <Shield className="w-8 h-8 text-[#7A8274] mx-auto" />
-                  <h4 className="text-sm font-bold text-[#242820]">No Active Rules</h4>
+                  <h4 className="text-sm font-bold text-[#242820]">No brand rules created yet</h4>
                   <p className="text-xs text-[#7A8274]">
-                    Use the form on the left to create your first brand governance rule.
+                    No brand rules created yet. Click 'Create Rule' to get started.
                   </p>
                 </div>
               )}

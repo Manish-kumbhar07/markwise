@@ -65,9 +65,7 @@ export async function getOrCreateUserWorkspace(
     }
 
     // Create a new isolated workspace on the fly for this user
-    const workspaceName = email
-      ? `${email.split('@')[0]}'s Workspace`
-      : `Workspace ${userId.slice(0, 8)}`;
+    const workspaceName = 'My Workspace';
 
     const newWorkspace = await tx.workspace.create({
       data: {
@@ -180,7 +178,7 @@ export async function getOrCreateDemoWorkspace() {
       update: {},
       create: {
         id: DEMO_WORKSPACE_ID,
-        name: 'Acme Global Marketing',
+        name: 'Markwise Enterprise',
       },
     });
 

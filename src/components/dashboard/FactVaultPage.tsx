@@ -67,8 +67,10 @@ export function FactVaultPage() {
       }
     }
     loadData();
+    window.addEventListener('workspace-changed', loadData);
     return () => {
       mounted = false;
+      window.removeEventListener('workspace-changed', loadData);
     };
   }, []);
 
@@ -263,7 +265,9 @@ export function FactVaultPage() {
                 {filteredFacts.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-12 text-xs text-[#7A8274]">
-                      No facts matched your search criteria.
+                      {facts.length === 0
+                        ? "No verified facts created yet. Click 'Add Verified Fact' to get started."
+                        : "No facts matched your search criteria."}
                     </TableCell>
                   </TableRow>
                 )}

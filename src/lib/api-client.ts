@@ -10,6 +10,12 @@ export async function apiRequest<T>(url: string, init?: RequestInit): Promise<T>
     if (token) {
       authHeaders['Authorization'] = `Bearer ${token}`;
     }
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const activeWs = window.localStorage.getItem('markwise_active_workspace_id');
+      if (activeWs) {
+        authHeaders['x-workspace-id'] = activeWs;
+      }
+    }
   } catch {
     // If running in an environment without browser storage, proceed without token
   }

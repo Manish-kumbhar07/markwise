@@ -48,6 +48,11 @@ export function ApprovalsPage() {
 
   useEffect(() => {
     void loadApprovals();
+    const handleWsChanged = () => {
+      void loadApprovals();
+    };
+    window.addEventListener('workspace-changed', handleWsChanged);
+    return () => window.removeEventListener('workspace-changed', handleWsChanged);
   }, []);
 
   const handleOpenReview = (item: ApprovalContentItem) => {

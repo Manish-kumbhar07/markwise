@@ -43,6 +43,11 @@ export function InsightsPage({ initialData }: InsightsPageProps) {
     if (!initialData) {
       void fetchData();
     }
+    const handleWsChanged = () => {
+      void fetchData();
+    };
+    window.addEventListener('workspace-changed', handleWsChanged);
+    return () => window.removeEventListener('workspace-changed', handleWsChanged);
   }, [initialData]);
 
   const handleNavigateToReview = () => {

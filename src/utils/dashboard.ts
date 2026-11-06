@@ -35,28 +35,24 @@ export const NAV_ITEMS: NavItemConfig[] = [
     id: 'brand-brain',
     label: 'Brand Rules',
     iconName: 'Shield',
-    badge: 'v2.4',
     description: 'Living brand guidelines, tone constraints, and versioned rules',
   },
   {
     id: 'fact-vault',
     label: 'Fact Vault',
     iconName: 'Database',
-    badge: '18 Docs',
     description: 'Enterprise evidence repository and verified proof anchors',
   },
   {
     id: 'review',
     label: 'Content Review',
     iconName: 'FileText',
-    badge: '2 Pending',
     description: 'Pre-publish claim scanner, explainability analysis, and suggested fixes',
   },
   {
     id: 'approvals',
     label: 'Approval Queue',
     iconName: 'CheckCircle',
-    badge: '3 Sign-offs',
     description: 'Role-based legal and brand guardian sign-off matrix',
   },
   {

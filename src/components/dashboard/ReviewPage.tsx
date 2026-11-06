@@ -82,6 +82,11 @@ export function ReviewPage() {
 
   useEffect(() => {
     void loadContent();
+    const handleWsChanged = () => {
+      void loadContent();
+    };
+    window.addEventListener('workspace-changed', handleWsChanged);
+    return () => window.removeEventListener('workspace-changed', handleWsChanged);
   }, []);
 
   const handleRunAiReview = () => {

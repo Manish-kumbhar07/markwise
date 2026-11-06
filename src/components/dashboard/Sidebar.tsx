@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { DashboardPage, NAV_ITEMS } from '../../utils/dashboard';
 import { createClient } from '@/utils/supabase/client';
+import { getWorkspaceStats, type WorkspaceStats } from '../../actions/workspace';
 
 interface SidebarProps {
   activePage: DashboardPage;
@@ -36,7 +37,23 @@ export function Sidebar({
   onCloseMobile,
 }: SidebarProps) {
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [stats, setStats] = useState<WorkspaceStats>({
+    rulesCount: 0,
+    factsCount: 0,
+    pendingCount: 0,
+    approvalsCount: 0,
+  });
+
   const supabase = createClient();
+
+  const loadStats = async () => {
+    try {
+      const data = await getWorkspaceStats();
+      setStats(data);
+    } catch (err) {
+      console.error('Failed to load workspace stats:', err);
+    }
+  };
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -44,6 +61,10 @@ export function Sidebar({
         setUserEmail(user.email);
       }
     });
+
+    loadStats();
+    window.addEventListener('workspace-changed', loadStats);
+    return () => window.removeEventListener('workspace-changed', loadStats);
   }, []);
 
   const handleSignOut = async () => {
@@ -52,9 +73,24 @@ export function Sidebar({
     window.dispatchEvent(new PopStateEvent('popstate'));
   };
 
-  const displayName = userEmail ? userEmail.split('@')[0] : 'Elena Rostova';
-  const displayEmail = userEmail || 'e.rostova@markwise.ai';
+  const displayName = userEmail ? userEmail.split('@')[0] : 'Brand Guardian';
+  const displayEmail = userEmail || 'governance@markwise.ai';
   const displayInitials = displayName.slice(0, 2).toUpperCase();
+
+  const getDynamicBadge = (id: DashboardPage): string | undefined => {
+    switch (id) {
+      case 'brand-brain':
+        return `${stats.rulesCount} Rules`;
+      case 'fact-vault':
+        return `${stats.factsCount} Docs`;
+      case 'review':
+        return `${stats.pendingCount} Pending`;
+      case 'approvals':
+        return `${stats.approvalsCount} Sign-offs`;
+      default:
+        return undefined;
+    }
+  };
 
   return (
     <>
@@ -133,6 +169,7 @@ export function Sidebar({
               {NAV_ITEMS.map((item) => {
                 const Icon = ICON_MAP[item.iconName];
                 const isActive = activePage === item.id;
+                const dynamicBadge = getDynamicBadge(item.id);
 
                 return (
                   <button
@@ -158,7 +195,7 @@ export function Sidebar({
                       <span>{item.label}</span>
                     </div>
 
-                    {item.badge && (
+                    {dynamicBadge && (
                       <span
                         className={`text-[10px] font-mono font-medium px-1.5 py-0.5 rounded ${
                           isActive
@@ -166,7 +203,7 @@ export function Sidebar({
                             : 'bg-white/10 text-white/50'
                         }`}
                       >
-                        {item.badge}
+                        {dynamicBadge}
                       </span>
                     )}
                   </button>
@@ -180,7 +217,6 @@ export function Sidebar({
         <div className="p-4 border-t border-white/10 bg-[#0e3025]/50">
           <div className="flex items-center justify-between gap-2 p-2 rounded-xl hover:bg-white/5 transition-colors">
             <div className="flex items-center gap-3 min-w-0">
-              {/* Circular Avatar with initials */}
               <div className="w-9 h-9 rounded-full bg-[#F47745] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs ring-2 ring-white/15">
                 {displayInitials}
               </div>

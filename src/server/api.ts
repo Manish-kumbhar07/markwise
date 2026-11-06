@@ -30,12 +30,27 @@ const supabaseAnonKey = (
 const supabaseServer = createSupabaseClient(supabaseUrl, supabaseAnonKey);
 
 async function resolveWorkspace(request: IncomingMessage): Promise<{ userId: string; workspaceId: string }> {
+  const targetWsId = (request.headers['x-workspace-id'] as string) || '';
   const authHeader = request.headers['authorization'];
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.substring(7).trim();
     if (token) {
       const { data: { user }, error } = await supabaseServer.auth.getUser(token);
       if (!error && user && user.id) {
+        if (targetWsId) {
+          const ws = await prisma.workspace.findFirst({
+            where: {
+              id: targetWsId,
+              OR: [
+                { users: { some: { id: user.id } } },
+                { id: targetWsId },
+              ],
+            },
+          });
+          if (ws) {
+            return { userId: user.id, workspaceId: ws.id };
+          }
+        }
         const userWs = await getOrCreateUserWorkspace(user.id, user.email);
         return { userId: user.id, workspaceId: userWs.workspaceId };
       }
@@ -44,7 +59,7 @@ async function resolveWorkspace(request: IncomingMessage): Promise<{ userId: str
 
   // Fallback to demo workspace for public unauthenticated landing page previews
   await getOrCreateDemoWorkspace();
-  return { userId: DEMO_USER_ID, workspaceId: DEMO_WORKSPACE_ID };
+  return { userId: DEMO_USER_ID, workspaceId: targetWsId || DEMO_WORKSPACE_ID };
 }
 
 function isJsonRecord(value: unknown): value is Record<string, unknown> {
@@ -688,6 +703,176 @@ If no issues are found, return { "issues": [] }.`;
       resolutionRate,
       severityData,
       statusData,
+    });
+    return;
+  }
+
+  if (method === 'GET' && pathname === '/api/workspaces') {
+    let workspaces = await prisma.workspace.findMany({
+      where: {
+        OR: [
+          { users: { some: { id: userId } } },
+          { id: workspaceId },
+        ],
+      },
+      include: {
+        _count: {
+          select: {
+            rules: true,
+            facts: true,
+          },
+        },
+      },
+      orderBy: { name: 'asc' },
+    });
+
+    if (workspaces.length === 0) {
+      const defaultWs = await prisma.workspace.create({
+        data: {
+          name: 'My Workspace',
+          users: {
+            connect: { id: userId },
+          },
+        },
+        include: {
+          _count: {
+            select: {
+              rules: true,
+              facts: true,
+            },
+          },
+        },
+      });
+
+      await prisma.user.upsert({
+        where: { id: userId },
+        update: { workspaceId: defaultWs.id },
+        create: {
+          id: userId,
+          email: `${userId}@markwise.ai`,
+          workspaceId: defaultWs.id,
+        },
+      });
+
+      workspaces = [defaultWs];
+    }
+
+    sendJson(
+      response,
+      200,
+      workspaces.map((ws) => ({
+        id: ws.id,
+        name: ws.name,
+        isCurrent: ws.id === workspaceId,
+        rulesCount: ws._count.rules,
+        factsCount: ws._count.facts,
+      }))
+    );
+    return;
+  }
+
+  if (method === 'POST' && pathname === '/api/workspaces') {
+    const body = await readJsonBody(request);
+    const name = stringValue(body, 'name').trim();
+    if (!name) {
+      sendJson(response, 400, { error: 'Workspace name is required.' });
+      return;
+    }
+
+    const newWorkspace = await prisma.workspace.create({
+      data: {
+        name,
+        users: {
+          connect: { id: userId },
+        },
+      },
+      include: {
+        _count: {
+          select: {
+            rules: true,
+            facts: true,
+          },
+        },
+      },
+    });
+
+    await prisma.user.upsert({
+      where: { id: userId },
+      update: { workspaceId: newWorkspace.id },
+      create: {
+        id: userId,
+        email: `${userId}@markwise.ai`,
+        workspaceId: newWorkspace.id,
+      },
+    });
+
+    sendJson(response, 201, {
+      id: newWorkspace.id,
+      name: newWorkspace.name,
+      isCurrent: true,
+      rulesCount: 0,
+      factsCount: 0,
+    });
+    return;
+  }
+
+  if (method === 'POST' && pathname === '/api/workspaces/switch') {
+    const body = await readJsonBody(request);
+    const targetWsId = stringValue(body, 'workspaceId').trim();
+    if (!targetWsId) {
+      sendJson(response, 400, { error: 'Workspace ID is required.' });
+      return;
+    }
+
+    const ws = await prisma.workspace.findUnique({
+      where: { id: targetWsId },
+    });
+    if (!ws) {
+      sendJson(response, 404, { error: 'Workspace not found.' });
+      return;
+    }
+
+    await prisma.user.upsert({
+      where: { id: userId },
+      update: { workspaceId: targetWsId },
+      create: {
+        id: userId,
+        email: `${userId}@markwise.ai`,
+        workspaceId: targetWsId,
+      },
+    });
+
+    sendJson(response, 200, { success: true, activeWorkspaceId: targetWsId });
+    return;
+  }
+
+  if (method === 'GET' && pathname === '/api/workspace/stats') {
+    const [rulesCount, factsCount, pendingCount, approvalsCount] = await Promise.all([
+      prisma.rule.count({
+        where: { workspaceId },
+      }),
+      prisma.fact.count({
+        where: { workspaceId },
+      }),
+      prisma.issue.count({
+        where: {
+          content: { workspaceId },
+          status: 'OPEN',
+        },
+      }),
+      prisma.content.count({
+        where: {
+          workspaceId,
+          status: { in: ['SUBMITTED_FOR_REVIEW', 'PENDING_APPROVAL', 'NEEDS_CHANGES'] },
+        },
+      }),
+    ]);
+
+    sendJson(response, 200, {
+      rulesCount,
+      factsCount,
+      pendingCount,
+      approvalsCount,
     });
     return;
   }
