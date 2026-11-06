@@ -16,8 +16,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { createRuleFromIssue } from '@/app/actions/rules';
-import type { ReviewIssueResult } from '@/app/actions/review';
+import { createRuleFromIssue } from '@/actions/rules';
+import type { ReviewIssueResult } from '@/actions/review';
 import { SeverityIndicator } from './dashboard/SeverityIndicator';
 
 interface IssueCardProps {
@@ -75,7 +75,6 @@ export function IssueCard({
       setIsDialogOpen(false);
       onRuleCreated?.(issue.id, ruleTitle);
     } catch (err: unknown) {
-      console.error('Failed to create rule from issue:', err);
       setRuleSaveError(
         err instanceof Error ? err.message : 'Failed to save rule to database'
       );
@@ -86,7 +85,8 @@ export function IssueCard({
 
   return (
     <>
-      <div
+      <article
+        aria-label={issue.ruleTitle || 'Brand Governance Issue'}
         className={`bg-[#FFFCF6] rounded-xl border transition-all duration-200 p-4 shadow-xs space-y-3 ${
           isRuleCreated
             ? 'border-[#123B2F]/60 ring-1 ring-[#123B2F]/20'
@@ -238,9 +238,9 @@ export function IssueCard({
             <span>AI-assisted</span>
           </span>
         </div>
-      </div>
+      </article>
 
-      {/* shadcn Dialog: "Create Brand Rule from this issue?" */}
+      {/* Dialog: "Create Brand Rule from this issue?" */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-md">
           <form onSubmit={handleConfirmSaveRule} className="space-y-4">

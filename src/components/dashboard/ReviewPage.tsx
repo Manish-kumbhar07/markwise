@@ -43,7 +43,6 @@ export function ReviewPage() {
   } | null>(null);
   const [isEditorMode, setIsEditorMode] = useState<boolean>(false);
 
-  // Auto-dismiss toast notification after 7 seconds
   useEffect(() => {
     if (!toastNotification) return;
     const timer = setTimeout(() => {
@@ -52,17 +51,14 @@ export function ReviewPage() {
     return () => clearTimeout(timer);
   }, [toastNotification]);
 
-  // useTransition for running AI review and accepting issues
   const [isPending, startTransition] = useTransition();
 
-  // Interactive modal state for Edit / Override
   const [activeModal, setActiveModal] = useState<{
     type: 'edit' | 'override';
     issueId: string;
     textValue: string;
   } | null>(null);
 
-  // Load real content & issues from Prisma
   const loadContent = async () => {
     setIsLoading(true);
     try {
@@ -88,14 +84,13 @@ export function ReviewPage() {
     void loadContent();
   }, []);
 
-  // Run AI Review using Gemini & Prisma
   const handleRunAiReview = () => {
     if (!contentId) return;
     setToastNotification(null);
 
     startTransition(async () => {
       try {
-        // Save current draft text first if modified
+        // Persist draft modifications before invoking server-side review
         await fetch('/api/review/content', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -126,7 +121,6 @@ export function ReviewPage() {
     });
   };
 
-  // Accept an issue fix
   const handleAcceptFix = (issue: ReviewIssueResult) => {
     startTransition(async () => {
       try {
@@ -177,7 +171,6 @@ export function ReviewPage() {
     });
   };
 
-  // Override an issue
   const handleOverride = (issueId: string) => {
     setIssues((prev) =>
       prev.map((iss) =>
@@ -191,7 +184,6 @@ export function ReviewPage() {
     });
   };
 
-  // Save custom edit
   const handleSaveCustomEdit = () => {
     if (!activeModal) return;
     const { issueId, textValue } = activeModal;
@@ -231,7 +223,6 @@ export function ReviewPage() {
     });
   };
 
-  // Reset to initial demo content
   const handleResetDraft = async () => {
     const defaultText =
       'Our platform guarantees the fastest performance on the market.';
@@ -257,7 +248,7 @@ export function ReviewPage() {
   return (
     <div className="space-y-5 animate-in fade-in duration-200">
       {/* TOP BAR: Draft Title, Status Badge, and large "Run AI Review" Button */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E8DFD0]">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E8DFD0]">
         <div className="space-y-0.5">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#123B2F] mb-0.5">
             <FileText className="w-3.5 h-3.5 text-[#F47745]" />
@@ -304,7 +295,7 @@ export function ReviewPage() {
             )}
           </button>
         </div>
-      </div>
+      </header>
 
       {toastNotification && (
         <div
@@ -367,7 +358,7 @@ export function ReviewPage() {
       )}
 
       <div className="flex flex-col md:flex-row gap-5 md:gap-6 items-start">
-        <div className="w-full md:w-[60%] flex flex-col space-y-3">
+        <section aria-label="Draft Content Editor" className="w-full md:w-[60%] flex flex-col space-y-3">
           <div className="flex items-center justify-between text-xs text-[#7A8274] px-1">
             <span className="font-mono uppercase tracking-wider font-semibold text-[#545B4E]">
               Content Editor Viewport (Prisma Content ID: {contentId.slice(0, 10)}...)
@@ -502,9 +493,9 @@ export function ReviewPage() {
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div className="w-full md:w-[40%] flex flex-col space-y-4">
+        <aside aria-label="Governance Issues" className="w-full md:w-[40%] flex flex-col space-y-4">
           <div className="flex items-center justify-between text-xs text-[#7A8274] px-1">
             <span className="font-mono uppercase tracking-wider font-semibold text-[#545B4E]">
               Governance Issues ({issues.length} Total)
@@ -577,14 +568,14 @@ export function ReviewPage() {
                     );
                     setToastNotification({
                       type: 'success',
-                      title: `Rule "${ruleTitle}" successfully saved to Brand Brain!`,
+                      title: `Rule "${ruleTitle}" successfully committed to Brand Rules.`,
                     });
                   }}
                 />
               ))
             )}
           </div>
-        </div>
+        </aside>
       </div>
 
       {/* Modal for Edit or Override */}
