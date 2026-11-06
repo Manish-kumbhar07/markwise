@@ -17,19 +17,7 @@ export interface ApprovalContentItem {
 }
 
 function deriveOriginalText(currentBody: string): string {
-  if (currentBody.includes('is designed for high-speed')) {
-    return currentBody.replace(
-      'is designed for high-speed',
-      'guarantees the fastest'
-    );
-  }
-  if (currentBody.includes('in peer enterprise benchmark evaluations')) {
-    return currentBody.replace(
-      'in peer enterprise benchmark evaluations',
-      'on the market'
-    );
-  }
-  return 'Our platform guarantees 100% fastest performance on the market with zero risk.';
+  return currentBody;
 }
 
 export async function getApprovalQueue(): Promise<ApprovalContentItem[]> {

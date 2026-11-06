@@ -116,7 +116,7 @@ export function HeroDashboardMockup({ onAcceptFix, priority = true }: HeroDashbo
               {/* Draft Header */}
               <div className="flex items-center justify-between pb-2 border-b border-[#E8DFD0]">
                 <div className="text-xs font-semibold text-[#123B2F] truncate">
-                  Campaign Draft — Q4 Product Launch
+                  Enterprise Copy Review
                 </div>
                 <span className="text-[9px] font-medium bg-[#E5EEDC] text-[#2F4734] px-1.5 py-0.5 rounded-full shrink-0">
                   Editing Draft
@@ -126,19 +126,19 @@ export function HeroDashboardMockup({ onAcceptFix, priority = true }: HeroDashbo
               {/* Editor Workspace Box */}
               <div className="mt-2.5 p-3 rounded-xl bg-white border border-[#E8DFD0] text-[12px] text-[#242820] leading-relaxed shadow-2xs min-h-[190px]">
                 <p>
-                  With our new update, we&apos;re proud to support teams worldwide. Our platform{' '}
+                  Deploy high-velocity marketing copy with verified brand compliance.{' '}
                   {!isAccepted ? (
                     <span className="bg-[#FCE8DF] text-[#C85A32] font-semibold px-1.5 py-0.5 rounded border border-[#F6C6B3] inline-flex items-center gap-1 shadow-2xs transition-all">
                       <AlertTriangle className="w-3 h-3 text-[#C85A32] shrink-0" />
-                      <span>guarantees the fastest performance</span>
+                      <span>Unverified superlative assertion</span>
                     </span>
                   ) : (
                     <span className="bg-[#E5EEDC] text-[#123B2F] font-semibold px-1.5 py-0.5 rounded border border-[#C5D6BB] inline-flex items-center gap-1 shadow-2xs transition-all">
                       <Check className="w-3 h-3 text-emerald-700 shrink-0 stroke-[2.5]" />
-                      <span>designed for high-speed performance</span>
+                      <span>Verified against active brand codex</span>
                     </span>
                   )}{' '}
-                  on the market, helping users achieve results in seconds.
+                  with complete auditability and proof citations.
                 </p>
               </div>
             </div>
