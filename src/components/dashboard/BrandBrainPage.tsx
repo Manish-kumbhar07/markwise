@@ -135,10 +135,10 @@ export function BrandBrainPage() {
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#123B2F] mb-1">
             <Shield className="w-4 h-4 text-[#F47745]" />
-            <span>Living Enterprise Codex</span>
+            <span>Enterprise Policy Engine</span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-[#242820] font-inter">
-            Brand Brain
+            Active Brand Rules
           </h1>
           <p className="mt-1 text-sm text-[#545B4E]">
             Define version-controlled brand guidelines, legal invariants, and voice constraints that govern enterprise content.

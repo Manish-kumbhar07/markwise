@@ -96,7 +96,7 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
             className="px-5 py-2.5 text-xs sm:text-sm font-semibold text-[#123B2F] dark:text-[#F7F2E8] border border-[#D5CDBD] dark:border-[#2B6856] bg-white/70 dark:bg-[#1A4C3E]/60 hover:bg-white dark:hover:bg-[#1A4C3E] rounded-xl transition-all shadow-2xs cursor-pointer active:scale-98 inline-flex items-center justify-center gap-2"
           >
             <LayoutDashboard className="w-4 h-4" />
-            <span>Go to Dashboard</span>
+            <span>Go to Overview</span>
           </button>
 
           <button

@@ -259,6 +259,10 @@ export function ReviewPage() {
       {/* TOP BAR: Draft Title, Status Badge, and large "Run AI Review" Button */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E8DFD0]">
         <div className="space-y-0.5">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#123B2F] mb-0.5">
+            <FileText className="w-3.5 h-3.5 text-[#F47745]" />
+            <span>Pre-Publication Review</span>
+          </div>
           <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#242820] font-inter">
               {contentTitle}

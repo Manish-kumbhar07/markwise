@@ -148,7 +148,7 @@ export function FactVaultPage() {
             <span>Deterministic Truth Anchors</span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-[#242820] font-inter">
-            Fact Vault
+            Fact & Evidence Vault
           </h1>
           <p className="mt-1 text-sm text-[#545B4E]">
             Immutable evidence repository anchoring marketing and product claims to verified legal and technical sources.

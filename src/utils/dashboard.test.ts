@@ -27,17 +27,17 @@ test('NAV_ITEMS contains all 5 required links with proper metadata', () => {
   assert.equal(NAV_ITEMS.length, 5);
   const labels = NAV_ITEMS.map((n) => n.label);
   assert.deepEqual(labels, [
-    'Brand Brain',
+    'Brand Rules',
     'Fact Vault',
-    'Review Content',
-    'Approvals',
-    'Insights',
+    'Content Review',
+    'Approval Queue',
+    'Governance Telemetry',
   ]);
 });
 
 test('getPageMetadata returns valid config', () => {
   const meta = getPageMetadata('brand-brain');
-  assert.equal(meta.label, 'Brand Brain');
+  assert.equal(meta.label, 'Brand Rules');
   assert.equal(meta.iconName, 'Shield');
 });
 

@@ -33,7 +33,7 @@ export interface NavItemConfig {
 export const NAV_ITEMS: NavItemConfig[] = [
   {
     id: 'brand-brain',
-    label: 'Brand Brain',
+    label: 'Brand Rules',
     iconName: 'Shield',
     badge: 'v2.4',
     description: 'Living brand guidelines, tone constraints, and versioned rules',
@@ -47,21 +47,21 @@ export const NAV_ITEMS: NavItemConfig[] = [
   },
   {
     id: 'review',
-    label: 'Review Content',
+    label: 'Content Review',
     iconName: 'FileText',
     badge: '2 Pending',
     description: 'Pre-publish claim scanner, explainability analysis, and suggested fixes',
   },
   {
     id: 'approvals',
-    label: 'Approvals',
+    label: 'Approval Queue',
     iconName: 'CheckCircle',
     badge: '3 Sign-offs',
     description: 'Role-based legal and brand guardian sign-off matrix',
   },
   {
     id: 'insights',
-    label: 'Insights',
+    label: 'Governance Telemetry',
     iconName: 'BarChart',
     description: 'Compliance telemetry, latency SLAs, and living rule evolution',
   },
@@ -72,7 +72,7 @@ export function getPageMetadata(pageId: DashboardPage): NavItemConfig {
   return (
     item || {
       id: 'brand-brain',
-      label: 'Brand Brain',
+      label: 'Brand Rules',
       iconName: 'Shield',
       description: 'Living brand guidelines and versioned rules',
     }
@@ -117,7 +117,7 @@ export function filterEvidenceBySearch(
   );
 }
 
-export type RuleType = 'BANNED_WORD' | 'TONE' | 'CLAIM';
+export type RuleType = 'BANNED_WORD' | 'TONE' | 'CLAIM' | 'COMPLIANCE' | 'VOICE_TONE';
 export type RuleSeverity = 'HIGH' | 'MEDIUM' | 'LOW';
 
 export interface RuleCard {
@@ -184,29 +184,29 @@ export function getSeverityBadgeColors(severity: RuleSeverity): {
 export const INITIAL_MOCK_RULES: RuleCard[] = [
   {
     id: 'BR-014 v1',
-    title: 'Absolute Guarantee & Zero-Risk Claim Prohibition',
+    title: 'Unsupported Superlatives',
     type: 'CLAIM',
     severity: 'HIGH',
     definition:
-      'Prohibits unqualified guarantees of immunity from fraud, security breaches, or 100% financial returns without accompanying regulatory disclaimer and partner bank disclosure.',
+      'Prohibits unqualified guarantees of immunity, fastest performance, or absolute superlatives without auditable benchmark evidence.',
     createdAt: 'Active · v1.4',
   },
   {
     id: 'BR-021 v2',
-    title: 'Unsubstantiated Performance Metrics',
-    type: 'CLAIM',
+    title: 'Tone: Professional & Direct',
+    type: 'VOICE_TONE',
     severity: 'MEDIUM',
     definition:
-      'Requires any percentage improvement or speed claim exceeding 50% to link directly to an approved benchmark or peer-reviewed study in the Fact Vault.',
+      'Avoid hyperbolic marketing colloquialisms and speculative buzzwords. Replace with measured, defensible enterprise language.',
     createdAt: 'Active · v2.1',
   },
   {
     id: 'BR-009 v1',
-    title: 'Aggressive or Hype-Driven Buzzwords',
-    type: 'BANNED_WORD',
-    severity: 'LOW',
+    title: 'Data Privacy Compliance',
+    type: 'COMPLIANCE',
+    severity: 'HIGH',
     definition:
-      'Avoid hyperbolic marketing colloquialisms such as "magic", "game-changing revolution", and "foolproof". Substitute with concrete, technical functionality statements.',
+      'Prohibits claims regarding user data retention, security compliance, or encryption without citing active SOC 2 Type II or ISO 27001 certifications.',
     createdAt: 'Active · v1.0',
   },
 ];
@@ -214,22 +214,22 @@ export const INITIAL_MOCK_RULES: RuleCard[] = [
 export const INITIAL_MOCK_FACTS: FactRecord[] = [
   {
     id: 'FV-801',
-    claim: '99.99% platform uptime guaranteed across all enterprise tier SLAs.',
-    evidenceSource: 'Enterprise Master Services Agreement §1.3 (SLA Exhibit B)',
+    claim: 'SOC 2 Type II Certification with Zero Data Retention architecture.',
+    evidenceSource: 'AICPA SOC 2 Type II Attestation Report 2025',
     expiryDate: '2027-12-31',
     status: 'Valid',
   },
   {
     id: 'FV-802',
-    claim: 'Customer deposits are eligible for FDIC pass-through coverage up to $250,000 via partner bank custodial accounts.',
-    evidenceSource: 'FDIC Custodial Placement Filing 12 CFR §330.5',
-    expiryDate: '2026-06-30',
+    claim: '99.9% Uptime SLA guaranteed across all enterprise tier production clusters.',
+    evidenceSource: 'Enterprise Master Services Agreement §1.3 (SLA Exhibit B)',
+    expiryDate: '2026-12-31',
     status: 'Valid',
   },
   {
     id: 'FV-803',
-    claim: 'Zero liability for unauthorized point-of-sale card transactions under Visa network rules.',
-    evidenceSource: 'Visa Global Operating Regulations Q2 2024 (Superseded)',
+    claim: 'End-to-end AES-256 encryption for data at rest and TLS 1.3 in transit.',
+    evidenceSource: 'NIST Cryptographic Standards Attestation (Superseded)',
     expiryDate: '2024-12-31',
     status: 'Expired',
   },

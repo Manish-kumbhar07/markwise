@@ -26,13 +26,13 @@ export function Header({
 }: HeaderProps) {
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [selectedWorkspace, setSelectedWorkspace] = useState('My Workspace');
+  const [selectedWorkspace, setSelectedWorkspace] = useState('Markwise Workspace');
 
   const workspaceRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
 
   const workspaces = [
-    { id: '1', name: 'My Workspace', tier: 'Enterprise Plan', org: 'Markwise Primary' },
+    { id: '1', name: 'Markwise Workspace', tier: 'Enterprise Plan', org: 'Markwise Primary' },
     { id: '2', name: 'Global Consumer Brands', tier: 'Enterprise Plan', org: 'Acme Holding Corp' },
     { id: '3', name: 'Fintech & Lending Staging', tier: 'Strict Banking Policy', org: 'Apex Payments' },
   ];
@@ -169,6 +169,8 @@ export function Header({
 
         {/* Quiet Breadcrumb / Environment Indicator */}
         <div className="hidden md:flex items-center gap-2 text-xs text-[#7A8274]">
+          <span>/</span>
+          <span className="font-semibold text-[#123B2F]">Overview</span>
           <span>/</span>
           <span className="font-medium text-[#242820]">Production Environment</span>
           <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#123B2F]/10 text-[#123B2F] font-semibold">

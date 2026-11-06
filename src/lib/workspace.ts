@@ -95,29 +95,29 @@ export async function getOrCreateUserWorkspace(
       data: [
         {
           workspaceId: newWorkspace.id,
-          title: 'Unsubstantiated Performance Claims',
+          title: 'Unsupported Superlatives',
           severity: 'HIGH',
           type: 'COMPLIANCE',
           definition:
-            'Never guarantee outcomes or claim "fastest on the market" without an auditable third-party benchmark anchor.',
+            'Prohibits unqualified guarantees of immunity, fastest performance, or absolute superlatives without auditable benchmark evidence.',
           version: 1,
         },
         {
           workspaceId: newWorkspace.id,
-          title: 'Evidence Attribution Required',
-          severity: 'HIGH',
-          type: 'COMPLIANCE',
-          definition:
-            'Any clinical, numerical, or statistical claim must cite an approved study or certified SEC filing.',
-          version: 1,
-        },
-        {
-          workspaceId: newWorkspace.id,
-          title: 'Brand Tone: Defensible & Honest',
+          title: 'Tone: Professional & Direct',
           severity: 'MEDIUM',
           type: 'VOICE_TONE',
           definition:
-            'Avoid speculative marketing hyperbole. Replace absolute superlatives with measured, verified performance descriptions.',
+            'Avoid speculative marketing hyperbole and colloquialisms. Replace with measured, verified performance descriptions.',
+          version: 1,
+        },
+        {
+          workspaceId: newWorkspace.id,
+          title: 'Data Privacy Compliance',
+          severity: 'HIGH',
+          type: 'COMPLIANCE',
+          definition:
+            'Prohibits claims regarding user data retention, security compliance, or encryption without citing certified enterprise attestations.',
           version: 1,
         },
       ],
@@ -128,16 +128,16 @@ export async function getOrCreateUserWorkspace(
       data: [
         {
           workspaceId: newWorkspace.id,
-          claim: 'Designed for high-speed performance in enterprise environments',
-          evidenceSource: 'EV-021: Independent Benchmark Evaluation 2025',
+          claim: 'SOC 2 Type II Certification with Zero Data Retention',
+          evidenceSource: 'EV-004: Enterprise Security Attestation Report',
           expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
           status: 'ACTIVE',
         },
         {
           workspaceId: newWorkspace.id,
-          claim: 'SOC 2 Type II Certified with Zero Data Retention',
-          evidenceSource: 'EV-004: Enterprise Security Attestation Report',
-          expiryDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
+          claim: '99.9% Uptime SLA guaranteed across all production environments',
+          evidenceSource: 'EV-021: Independent Benchmark Evaluation & SLA Attestation 2025',
+          expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
           status: 'ACTIVE',
         },
       ],

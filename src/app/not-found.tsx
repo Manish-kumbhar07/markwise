@@ -54,7 +54,7 @@ export default function NotFoundPage() {
             className="px-5 py-2.5 text-xs sm:text-sm font-semibold text-white bg-[#123B2F] dark:bg-[#F47745] hover:bg-[#1A4C3E] dark:hover:bg-[#E06432] rounded-xl transition-all shadow-xs hover:shadow-sm cursor-pointer active:scale-98 inline-flex items-center justify-center gap-2"
           >
             <LayoutDashboard className="w-4 h-4" />
-            <span>Return to Dashboard</span>
+            <span>Return to Overview</span>
           </Link>
 
           <Link

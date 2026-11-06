@@ -49,10 +49,10 @@ export default async function InsightsPage() {
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#123B2F] mb-1">
             <BarChartIcon className="w-4 h-4 text-[#F47745]" />
-            <span>Continuous Governance Telemetry</span>
+            <span>Continuous Telemetry Engine</span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-[#242820] font-inter">
-            Insights & Analytics
+            Governance Telemetry
           </h1>
           <p className="mt-1 text-sm text-[#545B4E]">
             Live aggregate telemetry on policy compliance, issue severity distribution, and brand rule velocity.
