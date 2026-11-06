@@ -90,7 +90,7 @@ function stringValue(body: Record<string, unknown>, key: string, fallback = ''):
   return typeof body[key] === 'string' ? body[key] : fallback;
 }
 
-async function handleApiRequest(request: IncomingMessage, response: ServerResponse) {
+export async function handleApiRequest(request: IncomingMessage, response: ServerResponse) {
   const method = request.method ?? 'GET';
   const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
   const { userId, workspaceId } = await resolveWorkspace(request);
@@ -695,17 +695,23 @@ If no issues are found, return { "issues": [] }.`;
   sendJson(response, 404, { error: 'API route not found.' });
 }
 
-export function apiHandler(
+export async function apiHandler(
   request: IncomingMessage,
   response: ServerResponse,
-  next: (error?: Error) => void
-) {
+  next?: (error?: Error) => void
+): Promise<void> {
   if (!request.url?.startsWith('/api/')) {
-    next();
+    if (next) {
+      next();
+    } else {
+      sendJson(response, 404, { error: 'API route not found.' });
+    }
     return;
   }
 
-  void handleApiRequest(request, response).catch((error: unknown) => {
+  try {
+    await handleApiRequest(request, response);
+  } catch (error: unknown) {
     if (error instanceof InvalidRequestError) {
       sendJson(response, 400, { error: error.message });
       return;
@@ -714,5 +720,5 @@ export function apiHandler(
     sendJson(response, 500, {
       error: 'The database request failed. Check the server logs.',
     });
-  });
+  }
 }
