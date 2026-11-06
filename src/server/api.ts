@@ -129,9 +129,8 @@ export async function handleApiRequest(request: IncomingMessage, response: Serve
       content = await prisma.content.create({
         data: {
           workspaceId,
-          title: 'Campaign Draft — Q4 Product Launch',
-          bodyText:
-            "With our new update, we're proud to support teams worldwide. Our platform guarantees the fastest performance on the market, helping users achieve results in seconds.",
+          title: 'Untitled Draft',
+          bodyText: '',
           status: 'DRAFT',
         },
         include: { issues: { include: { rule: true }, orderBy: { id: 'asc' } } },
@@ -158,6 +157,31 @@ export async function handleApiRequest(request: IncomingMessage, response: Serve
     return;
   }
 
+  if (method === 'POST' && pathname === '/api/review/draft') {
+    const body = await readJsonBody(request);
+    const title = stringValue(body, 'title', 'Untitled Draft');
+    const bodyText = stringValue(body, 'bodyText', '');
+
+    const newContent = await prisma.content.create({
+      data: {
+        workspaceId,
+        title: title.trim() || 'Untitled Draft',
+        bodyText: bodyText.trim(),
+        status: 'DRAFT',
+      },
+      include: { issues: { include: { rule: true }, orderBy: { id: 'asc' } } },
+    });
+
+    sendJson(response, 201, {
+      id: newContent.id,
+      title: newContent.title,
+      bodyText: newContent.bodyText,
+      status: newContent.status,
+      issues: [],
+    });
+    return;
+  }
+
   if (method === 'POST' && pathname === '/api/review/run') {
     // API Rate Limiting: Max 5 reviews per minute per user
     const rateLimit = checkRateLimit(`review:${userId}`);
@@ -172,7 +196,7 @@ export async function handleApiRequest(request: IncomingMessage, response: Serve
     const body = await readJsonBody(request);
     const contentId = stringValue(body, 'contentId');
 
-    const content = await prisma.content.findFirst({
+    let content = await prisma.content.findFirst({
       where: { id: contentId, workspaceId },
     });
 
@@ -181,8 +205,31 @@ export async function handleApiRequest(request: IncomingMessage, response: Serve
       return;
     }
 
+    // If client supplied updated text or title, persist before Gemini evaluation
+    const updatedBodyText = typeof body.bodyText === 'string' ? body.bodyText : null;
+    const updatedTitle = typeof body.title === 'string' && body.title.trim() ? body.title.trim() : null;
+    if (updatedBodyText !== null || updatedTitle !== null) {
+      content = await prisma.content.update({
+        where: { id: contentId },
+        data: {
+          ...(updatedBodyText !== null ? { bodyText: updatedBodyText } : {}),
+          ...(updatedTitle !== null ? { title: updatedTitle } : {}),
+          status: 'DRAFT',
+        },
+      });
+    }
+
     if (content.bodyText.length > 5000) {
       sendJson(response, 400, { success: false, error: 'Draft payload exceeds maximum allowed size of 5,000 characters.' });
+      return;
+    }
+
+    // If draft text is empty, clear issues and return
+    if (!content.bodyText.trim()) {
+      await prisma.issue.deleteMany({
+        where: { contentId },
+      });
+      sendJson(response, 200, { success: true, issues: [] });
       return;
     }
 
@@ -469,10 +516,7 @@ If no issues are found, return { "issues": [] }.`;
         const hasHighIssue = c.issues.some((i) => i.severity === 'HIGH');
         const hasMediumIssue = c.issues.some((i) => i.severity === 'MEDIUM');
 
-        let original = 'Our platform guarantees the fastest performance on the market.';
-        if (c.bodyText.includes('is designed for high-speed')) {
-          original = c.bodyText.replace('is designed for high-speed', 'guarantees the fastest');
-        }
+        const original = c.bodyText;
 
         return {
           id: c.id,

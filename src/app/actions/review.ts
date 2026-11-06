@@ -25,6 +25,41 @@ export interface ReviewContentResult {
   issues: ReviewIssueResult[];
 }
 
+export async function createDraft(input?: { title?: string; bodyText?: string } | FormData): Promise<ReviewContentResult> {
+  const { workspaceId } = await requireUserWorkspace();
+
+  let title = 'Untitled Draft';
+  let bodyText = '';
+
+  if (input instanceof FormData) {
+    title = (input.get('title') as string) || title;
+    bodyText = (input.get('bodyText') as string) || bodyText;
+  } else if (input) {
+    title = input.title || title;
+    bodyText = input.bodyText || bodyText;
+  }
+
+  const content = await prisma.content.create({
+    data: {
+      workspaceId,
+      title: title.trim(),
+      bodyText: bodyText.trim(),
+      status: 'DRAFT',
+    },
+    include: { issues: { include: { rule: true }, orderBy: { id: 'asc' } } },
+  });
+
+  revalidatePath('/dashboard/review');
+
+  return {
+    id: content.id,
+    title: content.title,
+    bodyText: content.bodyText,
+    status: content.status,
+    issues: [],
+  };
+}
+
 export async function getReviewContent(contentId?: string): Promise<ReviewContentResult> {
   const { workspaceId } = await requireUserWorkspace();
 
@@ -43,9 +78,8 @@ export async function getReviewContent(contentId?: string): Promise<ReviewConten
     content = await prisma.content.create({
       data: {
         workspaceId,
-        title: 'Campaign Draft — Q4 Product Launch',
-        bodyText:
-          "With our new update, we're proud to support teams worldwide. Our platform guarantees the fastest performance on the market, helping users achieve results in seconds.",
+        title: 'Untitled Draft',
+        bodyText: '',
         status: 'DRAFT',
       },
       include: { issues: { include: { rule: true }, orderBy: { id: 'asc' } } },
@@ -99,7 +133,11 @@ export async function saveDraftContent(contentId: string, bodyText: string, titl
   return updated;
 }
 
-export async function runAIReview(contentId: string): Promise<ReviewIssueResult[]> {
+export async function runAIReview(
+  contentId: string,
+  currentBodyText?: string,
+  currentTitle?: string
+): Promise<ReviewIssueResult[]> {
   const { userId, workspaceId } = await requireUserWorkspace();
 
   // API Rate Limiting: Max 5 requests per minute per user
@@ -111,12 +149,24 @@ export async function runAIReview(contentId: string): Promise<ReviewIssueResult[
   }
 
   // Step A: Fetch Content body strictly within this user's workspace
-  const content = await prisma.content.findFirst({
+  let content = await prisma.content.findFirst({
     where: { id: contentId, workspaceId },
   });
 
   if (!content) {
     throw new Error(`Content with ID ${contentId} not found or unauthorized.`);
+  }
+
+  // If text or title is passed from client, persist it first
+  if (typeof currentBodyText === 'string') {
+    content = await prisma.content.update({
+      where: { id: contentId },
+      data: {
+        bodyText: currentBodyText,
+        ...(currentTitle ? { title: currentTitle } : {}),
+        status: 'DRAFT',
+      },
+    });
   }
 
   if (content.bodyText.length > 5000) {

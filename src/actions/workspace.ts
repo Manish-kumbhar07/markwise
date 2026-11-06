@@ -36,3 +36,4 @@ export function switchWorkspace(workspaceId: string): Promise<{ success: boolean
 export function getWorkspaceStats(): Promise<WorkspaceStats> {
   return apiRequest<WorkspaceStats>('/api/workspace/stats');
 }
+

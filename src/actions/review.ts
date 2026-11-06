@@ -20,17 +20,39 @@ export interface ReviewContentResult {
   issues: ReviewIssueResult[];
 }
 
+export function createDraft(title?: string, bodyText?: string): Promise<ReviewContentResult> {
+  return apiRequest<ReviewContentResult>('/api/review/draft', {
+    method: 'POST',
+    body: JSON.stringify({ title, bodyText }),
+  });
+}
+
 export function getReviewContent(contentId?: string): Promise<ReviewContentResult> {
   const query = contentId ? `?contentId=${encodeURIComponent(contentId)}` : '';
   return apiRequest<ReviewContentResult>(`/api/review${query}`);
 }
 
-export async function runAIReview(contentId: string): Promise<ReviewIssueResult[]> {
+export function saveDraftContent(
+  contentId: string,
+  bodyText: string,
+  title?: string
+): Promise<{ success: boolean }> {
+  return apiRequest('/api/review/save-draft', {
+    method: 'POST',
+    body: JSON.stringify({ contentId, bodyText, title }),
+  });
+}
+
+export async function runAIReview(
+  contentId: string,
+  bodyText?: string,
+  title?: string
+): Promise<ReviewIssueResult[]> {
   const result = await apiRequest<{ success: boolean; issues: ReviewIssueResult[]; error?: string }>(
     '/api/review/run',
     {
       method: 'POST',
-      body: JSON.stringify({ contentId }),
+      body: JSON.stringify({ contentId, bodyText, title }),
     }
   );
   if (!result.success) {
@@ -45,4 +67,3 @@ export function acceptIssue(issueId: string, updatedText?: string): Promise<void
     body: JSON.stringify({ issueId, newText: updatedText }),
   });
 }
-

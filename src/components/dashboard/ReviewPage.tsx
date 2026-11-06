@@ -21,6 +21,7 @@ import {
   getReviewContent,
   runAIReview,
   acceptIssue,
+  saveDraftContent,
   type ReviewIssueResult,
 } from '@/actions/review';
 import { IssueCard } from '@/components/IssueCard';
@@ -29,11 +30,9 @@ import { StatusBadge } from './StatusBadge';
 
 export function ReviewPage() {
   const [contentId, setContentId] = useState<string>('');
-  const [contentTitle, setContentTitle] = useState<string>('Social Media Post Draft');
+  const [contentTitle, setContentTitle] = useState<string>('Untitled Draft');
   const [contentStatus, setContentStatus] = useState<string>('DRAFT');
-  const [draftContent, setDraftContent] = useState<string>(
-    'Our platform guarantees the fastest performance on the market.'
-  );
+  const [draftContent, setDraftContent] = useState<string>('');
   const [issues, setIssues] = useState<ReviewIssueResult[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [toastNotification, setToastNotification] = useState<{
@@ -41,7 +40,7 @@ export function ReviewPage() {
     title: string;
     description?: string;
   } | null>(null);
-  const [isEditorMode, setIsEditorMode] = useState<boolean>(false);
+  const [isEditorMode, setIsEditorMode] = useState<boolean>(true);
 
   useEffect(() => {
     if (!toastNotification) return;
@@ -64,9 +63,9 @@ export function ReviewPage() {
     try {
       const data = await getReviewContent();
       setContentId(data.id);
-      setContentTitle(data.title);
-      setContentStatus(data.status);
-      setDraftContent(data.bodyText);
+      setContentTitle(data.title || 'Untitled Draft');
+      setContentStatus(data.status || 'DRAFT');
+      setDraftContent(data.bodyText || '');
       setIssues(data.issues || []);
     } catch (err: unknown) {
       console.error('Failed to load review content:', err);
@@ -91,18 +90,21 @@ export function ReviewPage() {
 
   const handleRunAiReview = () => {
     if (!contentId) return;
+
+    if (!draftContent.trim()) {
+      setToastNotification({
+        type: 'info',
+        title: 'Empty Draft',
+        description: 'Please paste or write your marketing copy before running the AI review.',
+      });
+      return;
+    }
+
     setToastNotification(null);
 
     startTransition(async () => {
       try {
-        // Persist draft modifications before invoking server-side review
-        await fetch('/api/review/content', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contentId, bodyText: draftContent }),
-        });
-
-        const newIssues = await runAIReview(contentId);
+        const newIssues = await runAIReview(contentId, draftContent, contentTitle);
         setIssues(newIssues);
         setContentStatus('IN_REVIEW');
         setToastNotification({
@@ -112,7 +114,7 @@ export function ReviewPage() {
           } identified by Brand Governance model.`,
         });
       } catch (err: unknown) {
-        console.error('[AI Review Graceful Fallback]:', err);
+        console.error('[AI Review Error]:', err);
         const errorDetail = err instanceof Error ? err.message : '';
         setToastNotification({
           type: 'error',
@@ -132,60 +134,65 @@ export function ReviewPage() {
         let updatedText = draftContent;
 
         if (issue.suggestedFix) {
-          if (draftContent.includes('guarantees the fastest')) {
-            updatedText = draftContent.replace(
-              'guarantees the fastest',
-              issue.suggestedFix
-            );
-          } else if (draftContent.includes('on the market')) {
-            updatedText = draftContent.replace(
-              'on the market',
-              issue.suggestedFix
-            );
-          } else {
-            // General replacement: check if old phrase exists or update text
-            const firstFlaggedWord = issue.why.match(/"([^"]+)"/)?.[1];
-            if (firstFlaggedWord && draftContent.includes(firstFlaggedWord)) {
-              updatedText = draftContent.replace(firstFlaggedWord, issue.suggestedFix);
-            } else {
-              updatedText = issue.suggestedFix;
-            }
-          }
+          updatedText = issue.suggestedFix;
         }
 
         await acceptIssue(issue.id, updatedText);
         setDraftContent(updatedText);
         setIssues((prev) =>
-          prev.map((iss) =>
-            iss.id === issue.id ? { ...iss, status: 'ACCEPTED' } : iss
-          )
+          prev.map((iss) => (iss.id === issue.id ? { ...iss, status: 'ACCEPTED' } : iss))
         );
         setToastNotification({
           type: 'success',
-          title: `Fix applied: "${issue.suggestedFix}"`,
+          title: 'Revision Accepted: Draft updated with compliant language.',
         });
       } catch (err: unknown) {
         const errorDetail =
-          err instanceof Error ? err.message : 'Failed to apply suggested fix';
+          err instanceof Error ? err.message : 'Failed to accept revision';
         setToastNotification({
           type: 'error',
-          title: 'Failed to apply suggested fix',
+          title: 'Could not apply fix',
           description: errorDetail,
         });
       }
     });
   };
 
-  const handleOverride = (issueId: string) => {
-    setIssues((prev) =>
-      prev.map((iss) =>
-        iss.id === issueId ? { ...iss, status: 'OVERRIDDEN' } : iss
-      )
-    );
-    setActiveModal(null);
-    setToastNotification({
-      type: 'info',
-      title: 'Issue override recorded in audit logs.',
+  const handleOverrideIssue = () => {
+    if (!activeModal) return;
+    const { issueId, textValue } = activeModal;
+
+    startTransition(async () => {
+      try {
+        const reason = textValue.trim() || 'Pre-authorized compliance exception';
+        await acceptIssue(issueId, undefined);
+
+        setIssues((prev) =>
+          prev.map((iss) =>
+            iss.id === issueId
+              ? {
+                  ...iss,
+                  status: 'OVERRIDDEN',
+                  why: `${iss.why} [Human Override: ${reason}]`,
+                }
+              : iss
+          )
+        );
+        setActiveModal(null);
+        setToastNotification({
+          type: 'info',
+          title: 'Issue Override Recorded',
+          description: 'Logged to audit trail with cryptographic timestamp.',
+        });
+      } catch (err: unknown) {
+        const errorDetail =
+          err instanceof Error ? err.message : 'Failed to override issue';
+        setToastNotification({
+          type: 'error',
+          title: 'Override Failed',
+          description: errorDetail,
+        });
+      }
     });
   };
 
@@ -195,12 +202,7 @@ export function ReviewPage() {
 
     startTransition(async () => {
       try {
-        let updatedText = draftContent;
-        if (draftContent.includes('guarantees the fastest')) {
-          updatedText = draftContent.replace('guarantees the fastest', textValue);
-        } else {
-          updatedText = textValue;
-        }
+        const updatedText = textValue;
 
         await acceptIssue(issueId, updatedText);
         setDraftContent(updatedText);
@@ -229,41 +231,42 @@ export function ReviewPage() {
   };
 
   const handleResetDraft = async () => {
-    const defaultText =
-      'Our platform guarantees the fastest performance on the market.';
-    setDraftContent(defaultText);
+    setDraftContent('');
     setToastNotification(null);
     if (contentId) {
-      await fetch('/api/review/content', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contentId, bodyText: defaultText }),
-      });
+      await saveDraftContent(contentId, '', contentTitle);
       await loadContent();
     }
   };
 
-  const pendingCount = issues.filter(
-    (i) => i.status !== 'ACCEPTED' && i.status !== 'OVERRIDDEN'
-  ).length;
-
-  const wordCount = draftContent.trim() ? draftContent.trim().split(/\s+/).length : 0;
+  const wordCount = draftContent.trim()
+    ? draftContent.trim().split(/\s+/).length
+    : 0;
   const charCount = draftContent.length;
+  const pendingCount = issues.filter((iss) => iss.status === 'OPEN').length;
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-200">
-      {/* TOP BAR: Draft Title, Status Badge, and large "Run AI Review" Button */}
-      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E8DFD0]">
-        <div className="space-y-0.5">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#123B2F] mb-0.5">
-            <FileText className="w-3.5 h-3.5 text-[#F47745]" />
+    <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Page Header */}
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[#E8DFD0]">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#123B2F] mb-1">
+            <Shield className="w-4 h-4 text-[#F47745]" />
             <span>Pre-Publication Review</span>
           </div>
           <div className="flex items-center gap-2.5 flex-wrap">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#242820] font-inter">
-              {contentTitle}
-            </h1>
-
+            <input
+              type="text"
+              value={contentTitle}
+              onChange={(e) => setContentTitle(e.target.value)}
+              onBlur={() => {
+                if (contentId) {
+                  void saveDraftContent(contentId, draftContent, contentTitle);
+                }
+              }}
+              placeholder="Untitled Draft"
+              className="text-xl sm:text-2xl font-bold tracking-tight text-[#242820] font-inter bg-transparent border-b border-transparent hover:border-[#E8DFD0] focus:border-[#123B2F] focus:outline-none transition-colors"
+            />
             <StatusBadge status={contentStatus} />
           </div>
           <p className="text-xs text-[#545B4E]">
@@ -275,7 +278,7 @@ export function ReviewPage() {
           <button
             type="button"
             onClick={handleResetDraft}
-            title="Reset to Baseline Draft"
+            title="Clear Draft"
             className="p-2 rounded-lg border border-[#E8DFD0] bg-[#FFFCF6] hover:bg-[#FAF6EF] text-[#545B4E] hover:text-[#242820] transition-colors cursor-pointer shadow-2xs"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -290,7 +293,7 @@ export function ReviewPage() {
             {isPending ? (
               <>
                 <Loader2 className="w-3.5 h-3.5 text-[#F47745] animate-spin" />
-                <span>Analyzing...</span>
+                <span>Analyzing with Gemini...</span>
               </>
             ) : (
               <>
@@ -307,35 +310,23 @@ export function ReviewPage() {
           role="alert"
           className={`p-4 rounded-xl border flex items-start justify-between shadow-md transition-all duration-200 animate-in slide-in-from-top-2 ${
             toastNotification.type === 'error'
-              ? 'bg-[#FFF7F4] dark:bg-[#251714] border-2 border-[#F47745] text-[#242820] dark:text-[#FFFCF6] ring-1 ring-[#F47745]/30'
-              : toastNotification.type === 'info'
-              ? 'bg-[#F2F6FA] dark:bg-[#162734] border border-[#BACDD9] text-[#1D3557] dark:text-[#E0EBF3]'
-              : 'bg-[#FFFCF6] dark:bg-[#164336] border border-[#123B2F]/20 dark:border-[#205243] text-[#123B2F] dark:text-[#F7F2E8]'
+              ? 'bg-[#FFF7F4] border-2 border-[#F47745] text-[#242820] ring-1 ring-[#F47745]/30'
+              : toastNotification.type === 'success'
+              ? 'bg-[#F2F7F4] border-2 border-[#123B2F] text-[#123B2F]'
+              : 'bg-[#F7F2E8] border border-[#E8DFD0] text-[#242820]'
           }`}
         >
           <div className="flex items-start gap-3">
             {toastNotification.type === 'error' ? (
-              <div className="w-8 h-8 rounded-lg bg-[#F47745]/15 border border-[#F47745]/40 flex items-center justify-center text-[#F47745] shrink-0 mt-0.5">
-                <AlertCircle className="w-5 h-5 stroke-[2.4]" />
-              </div>
-            ) : toastNotification.type === 'info' ? (
-              <div className="w-8 h-8 rounded-lg bg-[#2E6F9E]/15 border border-[#2E6F9E]/40 flex items-center justify-center text-[#2E6F9E] shrink-0 mt-0.5">
-                <FileText className="w-4 h-4 stroke-[2]" />
-              </div>
+              <AlertCircle className="w-5 h-5 text-[#F47745] shrink-0 mt-0.5" />
+            ) : toastNotification.type === 'success' ? (
+              <CheckCircle2 className="w-5 h-5 text-[#123B2F] shrink-0 mt-0.5" />
             ) : (
-              <div className="w-8 h-8 rounded-lg bg-[#123B2F]/10 dark:bg-[#E5EEDC]/10 border border-[#123B2F]/20 flex items-center justify-center text-[#123B2F] dark:text-[#E5EEDC] shrink-0 mt-0.5">
-                <Sparkles className="w-4 h-4 text-[#F47745]" />
-              </div>
+              <Shield className="w-5 h-5 text-[#123B2F] shrink-0 mt-0.5" />
             )}
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
-                <span
-                  className={`text-xs sm:text-sm font-semibold tracking-tight ${
-                    toastNotification.type === 'error'
-                      ? 'text-[#C84B1A] dark:text-[#FF9D79]'
-                      : 'text-[#123B2F] dark:text-[#FFFCF6]'
-                  }`}
-                >
+                <span className="text-xs sm:text-sm font-bold font-inter">
                   {toastNotification.title}
                 </span>
                 {toastNotification.type === 'error' && (
@@ -345,7 +336,7 @@ export function ReviewPage() {
                 )}
               </div>
               {toastNotification.description && (
-                <p className="text-xs text-[#545B4E] dark:text-[#C5D3C1] leading-relaxed">
+                <p className="text-xs text-[#545B4E] leading-relaxed">
                   {toastNotification.description}
                 </p>
               )}
@@ -354,7 +345,7 @@ export function ReviewPage() {
           <button
             type="button"
             onClick={() => setToastNotification(null)}
-            className="text-[#7A8274] hover:text-[#242820] dark:hover:text-white p-1 rounded-md transition-colors cursor-pointer shrink-0 ml-3"
+            className="text-[#7A8274] hover:text-[#242820] p-1 rounded-md transition-colors cursor-pointer shrink-0 ml-3"
             aria-label="Dismiss notification"
           >
             <X className="w-4 h-4" />
@@ -366,7 +357,7 @@ export function ReviewPage() {
         <section aria-label="Draft Content Editor" className="w-full md:w-[60%] flex flex-col space-y-3">
           <div className="flex items-center justify-between text-xs text-[#7A8274] px-1">
             <span className="font-mono uppercase tracking-wider font-semibold text-[#545B4E]">
-              Content Editor Viewport (Prisma Content ID: {contentId.slice(0, 10)}...)
+              Content Editor Viewport {contentId ? `(ID: ${contentId.slice(0, 10)}...)` : ''}
             </span>
             <button
               type="button"
@@ -440,7 +431,7 @@ export function ReviewPage() {
                   value={draftContent}
                   onChange={(e) => setDraftContent(e.target.value)}
                   placeholder="Paste or write your marketing draft here..."
-                  className="w-full p-4 rounded-xl border border-[#E8DFD0] bg-[#FAF6EF]/60 text-lg sm:text-xl font-medium text-[#242820] font-inter focus:outline-none focus:border-[#123B2F] leading-relaxed resize-none"
+                  className="w-full p-4 rounded-xl border border-[#E8DFD0] bg-[#FAF6EF]/60 text-base sm:text-lg font-medium text-[#242820] font-inter focus:outline-none focus:border-[#123B2F] leading-relaxed resize-none min-h-[220px]"
                 />
               ) : (
                 <div
@@ -448,23 +439,13 @@ export function ReviewPage() {
                   className="cursor-text min-h-[160px]"
                   title="Click to edit text"
                 >
-                  <p className="text-xl sm:text-2xl font-medium text-[#242820] leading-relaxed font-inter">
-                    {draftContent.includes('guarantees the fastest') ? (
-                      <>
-                        {draftContent.split('guarantees the fastest')[0]}
-                        <mark
-                          className="bg-[#F47745]/20 text-[#242820] px-2 py-0.5 rounded-md border-b-2 border-[#F47745] font-semibold decoration-none inline-flex items-center gap-1.5 shadow-2xs"
-                          title="Flagged by Brand Rule: Superlative claim"
-                        >
-                          <span>guarantees the fastest</span>
-                          <span className="text-[10px] font-mono bg-[#F47745] text-white px-1.5 py-0.2 rounded font-bold uppercase tracking-wider">
-                            Flagged
-                          </span>
-                        </mark>
-                        {draftContent.split('guarantees the fastest')[1]}
-                      </>
-                    ) : (
+                  <p className="text-base sm:text-lg font-medium text-[#242820] leading-relaxed font-inter whitespace-pre-wrap">
+                    {draftContent ? (
                       <span>{draftContent}</span>
+                    ) : (
+                      <span className="text-[#7A8274] italic">
+                        Draft is currently empty. Click here or switch to Edit mode to paste or write copy.
+                      </span>
                     )}
                   </p>
                 </div>
@@ -516,7 +497,7 @@ export function ReviewPage() {
                 {[1, 2].map((n) => (
                   <div
                     key={n}
-                    className="bg-[#FFFCF6] dark:bg-[#164336] rounded-xl border border-[#E8DFD0] dark:border-[#205243] p-4 sm:p-5 shadow-xs space-y-3"
+                    className="bg-[#FFFCF6] rounded-xl border border-[#E8DFD0] p-4 sm:p-5 shadow-xs space-y-3"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -573,7 +554,8 @@ export function ReviewPage() {
                     );
                     setToastNotification({
                       type: 'success',
-                      title: `Rule "${ruleTitle}" successfully committed to Brand Rules.`,
+                      title: `New Living Brand Rule Created: "${ruleTitle}"`,
+                      description: 'Added to your brand rulebook in Prisma.',
                     });
                   }}
                 />
@@ -583,19 +565,15 @@ export function ReviewPage() {
         </aside>
       </div>
 
-      {/* Modal for Edit or Override */}
-      {activeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-[#FFFCF6] border border-[#E8DFD0] rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4 animate-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between pb-3 border-b border-[#E8DFD0]">
-              <h3 className="text-base font-bold text-[#242820] font-inter flex items-center gap-2">
+      {/* Edit Fix Modal */}
+      {activeModal?.type === 'edit' && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#FFFCF6] rounded-2xl border border-[#E8DFD0] shadow-xl max-w-lg w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-[#E8DFD0]/70 pb-3">
+              <div className="flex items-center gap-2">
                 <Edit3 className="w-4 h-4 text-[#123B2F]" />
-                <span>
-                  {activeModal.type === 'edit'
-                    ? 'Edit Suggested Revision'
-                    : 'Record Executive Override'}
-                </span>
-              </h3>
+                <h3 className="text-base font-bold text-[#242820]">Customize Suggested Fix</h3>
+              </div>
               <button
                 type="button"
                 onClick={() => setActiveModal(null)}
@@ -605,64 +583,91 @@ export function ReviewPage() {
               </button>
             </div>
 
-            {activeModal.type === 'edit' ? (
-              <div className="space-y-3">
-                <p className="text-xs text-[#545B4E]">
-                  Modify the proposed wording before accepting and substituting it into the draft text.
-                </p>
-                <textarea
-                  rows={3}
-                  value={activeModal.textValue}
-                  onChange={(e) =>
-                    setActiveModal({ ...activeModal, textValue: e.target.value })
-                  }
-                  className="w-full p-3 rounded-xl border border-[#E8DFD0] bg-[#F7F2E8] text-sm text-[#242820] focus:outline-none focus:border-[#123B2F]"
-                />
-                <div className="flex items-center justify-end gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setActiveModal(null)}
-                    className="px-4 py-2 text-xs font-semibold text-[#545B4E] hover:bg-[#F7F2E8] rounded-xl"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleSaveCustomEdit}
-                    className="px-4 py-2 text-xs font-semibold text-white bg-[#123B2F] hover:bg-[#0c2921] rounded-xl shadow-xs"
-                  >
-                    Save & Apply
-                  </button>
-                </div>
+            <p className="text-xs text-[#545B4E]">
+              Modify the proposed phrasing before applying it to your live document draft.
+            </p>
+
+            <textarea
+              rows={4}
+              value={activeModal.textValue}
+              onChange={(e) =>
+                setActiveModal({ ...activeModal, textValue: e.target.value })
+              }
+              className="w-full text-xs p-3 rounded-xl border border-[#E8DFD0] bg-[#F7F2E8]/40 text-[#242820] focus:ring-2 focus:ring-[#123B2F] resize-none"
+            />
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#E8DFD0]/70">
+              <button
+                type="button"
+                onClick={() => setActiveModal(null)}
+                className="px-4 py-2 rounded-xl border border-[#E8DFD0] text-xs font-semibold text-[#545B4E] hover:bg-[#F7F2E8]"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveCustomEdit}
+                disabled={isPending}
+                className="px-4 py-2 rounded-xl bg-[#123B2F] text-white text-xs font-semibold hover:bg-[#1b5343] flex items-center gap-2 disabled:opacity-50"
+              >
+                {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                <span>Apply to Draft</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Override Rule Modal */}
+      {activeModal?.type === 'override' && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#FFFCF6] rounded-2xl border border-[#E8DFD0] shadow-xl max-w-lg w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-[#E8DFD0]/70 pb-3">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-[#F47745]" />
+                <h3 className="text-base font-bold text-[#242820]">Document Governance Override</h3>
               </div>
-            ) : (
-              <div className="space-y-3">
-                <p className="text-xs text-[#545B4E]">
-                  Provide a compliance rationale to bypass this rule check. Overrides are cryptographically logged in the audit ledger.
-                </p>
-                <textarea
-                  rows={3}
-                  placeholder="e.g. Legal exception approved by Chief Compliance Officer under Section 4.2..."
-                  className="w-full p-3 rounded-xl border border-[#E8DFD0] bg-[#F7F2E8] text-sm text-[#242820] focus:outline-none focus:border-[#123B2F]"
-                />
-                <div className="flex items-center justify-end gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setActiveModal(null)}
-                    className="px-4 py-2 text-xs font-semibold text-[#545B4E] hover:bg-[#F7F2E8] rounded-xl"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleOverride(activeModal.issueId)}
-                    className="px-4 py-2 text-xs font-semibold text-white bg-[#F47745] hover:bg-[#dc612e] rounded-xl shadow-xs"
-                  >
-                    Confirm Override
-                  </button>
-                </div>
-              </div>
-            )}
+              <button
+                type="button"
+                onClick={() => setActiveModal(null)}
+                className="text-[#7A8274] hover:text-[#242820] p-1 rounded-lg"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-xs text-[#545B4E]">
+              Provide justification for bypassing this brand rule constraint. This rationale will be permanently recorded in the immutable compliance audit log.
+            </p>
+
+            <textarea
+              rows={3}
+              placeholder="e.g. Legal counsel approved exception for Q4 campaign launch via Ticket #LG-8941..."
+              value={activeModal.textValue}
+              onChange={(e) =>
+                setActiveModal({ ...activeModal, textValue: e.target.value })
+              }
+              className="w-full text-xs p-3 rounded-xl border border-[#E8DFD0] bg-[#F7F2E8]/40 text-[#242820] focus:ring-2 focus:ring-[#123B2F] resize-none"
+            />
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#E8DFD0]/70">
+              <button
+                type="button"
+                onClick={() => setActiveModal(null)}
+                className="px-4 py-2 rounded-xl border border-[#E8DFD0] text-xs font-semibold text-[#545B4E] hover:bg-[#F7F2E8]"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleOverrideIssue}
+                disabled={isPending}
+                className="px-4 py-2 rounded-xl bg-[#F47745] text-white text-xs font-semibold hover:bg-[#e06636] flex items-center gap-2 disabled:opacity-50"
+              >
+                {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                <span>Confirm Override</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
