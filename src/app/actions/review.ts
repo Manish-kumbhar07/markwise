@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { GoogleGenAI } from '@google/genai';
 import { prisma } from '@/lib/prisma';
-import { DEMO_WORKSPACE_ID, getOrCreateDemoWorkspace } from '@/lib/workspace';
+import { requireUserWorkspace, checkRateLimit } from '@/lib/workspace';
 
 export interface ReviewIssueResult {
   id: string;
@@ -26,32 +26,26 @@ export interface ReviewContentResult {
 }
 
 export async function getReviewContent(contentId?: string): Promise<ReviewContentResult> {
-  if (typeof window !== 'undefined') {
-    const res = await fetch(`/api/review${contentId ? `?contentId=${encodeURIComponent(contentId)}` : ''}`);
-    if (!res.ok) {
-      throw new Error('Failed to fetch review content');
-    }
-    return res.json();
-  }
-
-  await getOrCreateDemoWorkspace();
+  const { workspaceId } = await requireUserWorkspace();
 
   let content = contentId
-    ? await prisma.content.findUnique({
-        where: { id: contentId },
+    ? await prisma.content.findFirst({
+        where: { id: contentId, workspaceId },
         include: { issues: { include: { rule: true }, orderBy: { id: 'asc' } } },
       })
     : await prisma.content.findFirst({
-        where: { workspaceId: DEMO_WORKSPACE_ID },
+        where: { workspaceId },
         include: { issues: { include: { rule: true }, orderBy: { id: 'asc' } } },
+        orderBy: { id: 'desc' },
       });
 
   if (!content) {
     content = await prisma.content.create({
       data: {
-        workspaceId: DEMO_WORKSPACE_ID,
-        title: 'Social Media Post Draft',
-        bodyText: 'Our platform guarantees the fastest performance on the market.',
+        workspaceId,
+        title: 'Campaign Draft — Q4 Product Launch',
+        bodyText:
+          "With our new update, we're proud to support teams worldwide. Our platform guarantees the fastest performance on the market, helping users achieve results in seconds.",
         status: 'DRAFT',
       },
       include: { issues: { include: { rule: true }, orderBy: { id: 'asc' } } },
@@ -77,36 +71,68 @@ export async function getReviewContent(contentId?: string): Promise<ReviewConten
   };
 }
 
-export async function runAIReview(contentId: string): Promise<ReviewIssueResult[]> {
-  if (typeof window !== 'undefined') {
-    const res = await fetch('/api/review/run', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contentId }),
-    });
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || 'Failed to run AI Review');
-    }
-    return data.issues;
+export async function saveDraftContent(contentId: string, bodyText: string, title?: string) {
+  const { workspaceId } = await requireUserWorkspace();
+
+  if (bodyText.length > 5000) {
+    throw new Error('Draft payload exceeds maximum allowed size of 5,000 characters.');
   }
 
-  await getOrCreateDemoWorkspace();
-
-  // Step A: Fetch Content body from Prisma
-  const content = await prisma.content.findUnique({
-    where: { id: contentId },
+  const content = await prisma.content.findFirst({
+    where: { id: contentId, workspaceId },
   });
 
   if (!content) {
-    throw new Error(`Content with ID ${contentId} not found.`);
+    throw new Error('Content not found or unauthorized.');
   }
 
-  // Step B: Fetch all active Rule objects for this workspace from Prisma
-  const rules = await prisma.rule.findMany({
-    where: { workspaceId: content.workspaceId },
-    orderBy: { createdAt: 'desc' },
+  const updated = await prisma.content.update({
+    where: { id: contentId },
+    data: {
+      bodyText,
+      ...(title ? { title } : {}),
+      status: 'DRAFT',
+    },
   });
+
+  revalidatePath('/dashboard/review');
+  return updated;
+}
+
+export async function runAIReview(contentId: string): Promise<ReviewIssueResult[]> {
+  const { userId, workspaceId } = await requireUserWorkspace();
+
+  // API Rate Limiting: Max 5 requests per minute per user
+  const rateLimit = checkRateLimit(`review:${userId}`);
+  if (!rateLimit.allowed) {
+    throw new Error(
+      `Rate limit exceeded: You can only run AI Review 5 times per minute. Please try again in ${rateLimit.retryAfterSeconds} seconds.`
+    );
+  }
+
+  // Step A: Fetch Content body strictly within this user's workspace
+  const content = await prisma.content.findFirst({
+    where: { id: contentId, workspaceId },
+  });
+
+  if (!content) {
+    throw new Error(`Content with ID ${contentId} not found or unauthorized.`);
+  }
+
+  if (content.bodyText.length > 5000) {
+    throw new Error('Draft payload exceeds maximum allowed size of 5,000 characters.');
+  }
+
+  // Step B: Fetch active Rule and Fact objects strictly for this workspace
+  const [rules, facts] = await Promise.all([
+    prisma.rule.findMany({
+      where: { workspaceId },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.fact.findMany({
+      where: { workspaceId, status: 'ACTIVE' },
+    }),
+  ]);
 
   const rulesContext = rules.map((r) => ({
     id: r.id,
@@ -116,7 +142,13 @@ export async function runAIReview(contentId: string): Promise<ReviewIssueResult[
     definition: r.definition,
   }));
 
-  // Step C: Initialize the Google Gemini client with process.env.GEMINI_API_KEY
+  const factsContext = facts.map((f) => ({
+    id: f.id,
+    claim: f.claim,
+    evidenceSource: f.evidenceSource,
+  }));
+
+  // Step C: Initialize the Google Gemini client
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error('GEMINI_API_KEY is not configured in environment variables.');
@@ -125,7 +157,16 @@ export async function runAIReview(contentId: string): Promise<ReviewIssueResult[
   const ai = new GoogleGenAI({ apiKey });
 
   // Step D: Call Gemini API with strict JSON mode
-  const prompt = `You are Markwise, an expert AI brand reviewer. Review this text: "${content.bodyText}". Check it against these rules: ${JSON.stringify(rulesContext)}. Return a JSON object with an 'issues' array. Each issue must have: rule_id, issue_title, why, severity (HIGH, MEDIUM, LOW), suggested_fix. If no issues, return { issues: [] }.`;
+  const prompt = `You are Markwise, an expert AI brand reviewer. Review this draft: "${content.bodyText}".
+Brand Rules: ${JSON.stringify(rulesContext)}.
+Evidence Anchors: ${JSON.stringify(factsContext)}.
+Return a JSON object with an 'issues' array. Each issue must have:
+- rule_id (string or null)
+- issue_title (string)
+- why (string explaining the violation and citing evidence or lack thereof)
+- severity (HIGH, MEDIUM, or LOW)
+- suggested_fix (string containing compliant alternative phrasing)
+If no issues are found, return { "issues": [] }.`;
 
   let geminiResponse;
   try {
@@ -168,8 +209,7 @@ export async function runAIReview(contentId: string): Promise<ReviewIssueResult[
 
   const parsedIssues = Array.isArray(parsed.issues) ? parsed.issues : [];
 
-  // Step E: Parse JSON. Save each issue to the Prisma Issue table linked to contentId
-  // Clear any existing OPEN issues for this content to prevent duplicates
+  // Step E: Parse JSON. Save each issue linked to contentId
   await prisma.issue.deleteMany({
     where: {
       contentId,
@@ -180,23 +220,22 @@ export async function runAIReview(contentId: string): Promise<ReviewIssueResult[
   const createdIssues: ReviewIssueResult[] = [];
 
   for (const item of parsedIssues) {
-    const matchedRule = rules.find(
-      (r) => r.id === item.rule_id || r.title.toLowerCase() === item.issue_title?.toLowerCase()
-    );
+    const matchedRuleId = rules.some((r) => r.id === item.rule_id) ? item.rule_id : null;
+    const severityRaw = (item.severity || 'MEDIUM').toUpperCase();
+    const cleanSeverity =
+      severityRaw === 'HIGH' ? 'HIGH' : severityRaw === 'LOW' ? 'LOW' : 'MEDIUM';
 
     const issue = await prisma.issue.create({
       data: {
         contentId,
-        ruleId: matchedRule ? matchedRule.id : null,
-        severity: item.severity?.toUpperCase() === 'HIGH' ? 'HIGH' : item.severity?.toUpperCase() === 'LOW' ? 'LOW' : 'MEDIUM',
-        explanation: item.why || 'Flagged by AI brand governance review',
-        suggestedFix: item.suggested_fix || '',
+        ruleId: matchedRuleId,
+        severity: cleanSeverity,
+        explanation: item.why || 'Potential violation of brand compliance standards.',
+        suggestedFix: item.suggested_fix || 'Review wording to ensure brand alignment.',
         status: 'OPEN',
         aiAssisted: true,
       },
-      include: {
-        rule: true,
-      },
+      include: { rule: true },
     });
 
     createdIssues.push({
@@ -218,35 +257,29 @@ export async function runAIReview(contentId: string): Promise<ReviewIssueResult[
     data: { status: 'IN_REVIEW' },
   });
 
-  // Step G: Call revalidatePath('/dashboard/review')
   revalidatePath('/dashboard/review');
+  revalidatePath('/dashboard/approvals');
+  revalidatePath('/dashboard/insights');
 
   return createdIssues;
 }
 
 export async function acceptIssue(issueId: string, newText: string): Promise<void> {
-  if (typeof window !== 'undefined') {
-    const res = await fetch('/api/review/accept', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ issueId, newText }),
-    });
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || 'Failed to accept issue');
-    }
-    return;
-  }
+  const { workspaceId } = await requireUserWorkspace();
 
   const issue = await prisma.issue.findUnique({
     where: { id: issueId },
+    include: { content: true },
   });
 
-  if (!issue) {
+  if (!issue || !issue.content) {
     throw new Error(`Issue with ID ${issueId} not found.`);
   }
 
-  // Update Content bodyText with new text
+  if (issue.content.workspaceId !== workspaceId) {
+    throw new Error('Unauthorized: Issue belongs to another workspace.');
+  }
+
   if (newText) {
     await prisma.content.update({
       where: { id: issue.contentId },
@@ -254,11 +287,12 @@ export async function acceptIssue(issueId: string, newText: string): Promise<voi
     });
   }
 
-  // Update Issue status to ACCEPTED
   await prisma.issue.update({
     where: { id: issueId },
     data: { status: 'ACCEPTED' },
   });
 
   revalidatePath('/dashboard/review');
+  revalidatePath('/dashboard/approvals');
+  revalidatePath('/dashboard/insights');
 }

@@ -34,3 +34,13 @@ export function deleteRule(id: string): Promise<void> {
     method: 'DELETE',
   });
 }
+
+export function createRuleFromIssue(
+  issueId: string,
+  customData?: { title?: string; definition?: string; severity?: string; type?: string }
+): Promise<RuleRecord> {
+  return apiRequest('/api/rules/from-issue', {
+    method: 'POST',
+    body: JSON.stringify({ issueId, ...customData }),
+  });
+}

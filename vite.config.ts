@@ -40,6 +40,14 @@ export default defineConfig(() => {
     resolve: {
       alias: [
         {
+          find: 'next/image',
+          replacement: path.resolve(import.meta.dirname, 'src/lib/next-image.tsx'),
+        },
+        {
+          find: 'next/link',
+          replacement: path.resolve(import.meta.dirname, 'src/lib/next-link.tsx'),
+        },
+        {
           find: 'next/navigation',
           replacement: path.resolve(import.meta.dirname, 'src/lib/next-navigation.ts'),
         },
@@ -65,14 +73,31 @@ export default defineConfig(() => {
       'process.env.NEXT_PUBLIC_SUPABASE_URL': JSON.stringify(supabaseUrl),
       'process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY': JSON.stringify(supabaseAnonKey),
       'process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY': JSON.stringify(supabasePublishableKey),
-      'process.env': JSON.stringify(process.env),
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
     },
     server: {
-      // HMR is disabled in AI Studio via DISABLE_HMR env var.
-      // Do not modify—file watching is disabled to prevent flickering during agent edits.
+      // HMR can be configured via DISABLE_HMR env var.
+      // File watching is managed to prevent flickering during rapid updates.
       hmr: process.env.DISABLE_HMR !== 'true',
       // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules/recharts') || id.includes('node_modules/d3-')) {
+              return 'recharts';
+            }
+            if (id.includes('node_modules/@supabase')) {
+              return 'supabase';
+            }
+            if (id.includes('node_modules/lucide-react')) {
+              return 'icons';
+            }
+          },
+        },
+      },
     },
   };
 });

@@ -17,7 +17,13 @@ import { Footer } from './components/Footer';
 import { BackgroundDecoration } from './components/BackgroundDecoration';
 import { GetStartedModal } from './components/modals/GetStartedModal';
 import { DocsModal } from './components/modals/DocsModal';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { ThemeProvider } from './components/ThemeProvider';
 import LoginPage from './app/login/page';
+import DocsPage from './app/docs/page';
+import PrivacyPolicyPage from './app/privacy/page';
+import TermsOfServicePage from './app/terms/page';
+import NotFoundPage from './app/not-found';
 import { createClient } from '@/utils/supabase/client';
 import { ActiveTab } from './utils/governance';
 import { DashboardPage } from './utils/dashboard';
@@ -36,13 +42,11 @@ export default function App() {
   const supabase = createClient();
 
   useEffect(() => {
-    // 1. Initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setAuthChecked(true);
     });
 
-    // 2. Real-time auth state subscription
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, newSession) => {
@@ -50,7 +54,6 @@ export default function App() {
       setAuthChecked(true);
     });
 
-    // 3. Browser location popstate listener
     const handleLocationChange = () => {
       setCurrentPath(window.location.pathname);
     };
@@ -62,17 +65,14 @@ export default function App() {
     };
   }, []);
 
-  // Strict route protection & redirection (matching src/middleware.ts)
   useEffect(() => {
     if (!authChecked) return;
 
-    // 1. If unauthenticated and accessing protected /dashboard routes -> redirect to /login
     if (!session && (currentPath === '/dashboard' || currentPath.startsWith('/dashboard/'))) {
       window.history.replaceState({}, '', '/login');
       setCurrentPath('/login');
     }
 
-    // 2. If authenticated and visiting /login or / -> redirect to /dashboard/rules
     if (session && (currentPath === '/login' || currentPath === '/')) {
       window.history.replaceState({}, '', '/dashboard/rules');
       setCurrentPath('/dashboard/rules');
@@ -84,83 +84,115 @@ export default function App() {
     setCurrentPath(path);
   };
 
-  // Determine initial dashboard tab based on URL path
   const getDashboardInitialPage = (): DashboardPage => {
     if (currentPath === '/dashboard/facts') return 'fact-vault';
     if (currentPath === '/dashboard/rules') return 'brand-brain';
     if (currentPath === '/dashboard/review') return 'review';
+    if (currentPath === '/dashboard/approvals') return 'approvals';
+    if (currentPath === '/dashboard/insights') return 'insights';
     return 'brand-brain';
   };
 
-  // Dedicated Login Route
   if (currentPath === '/login') {
-    return <LoginPage />;
-  }
-
-  // Protected Dashboard Route
-  if (currentPath.startsWith('/dashboard')) {
     return (
-      <GlobalDashboardLayout
-        initialPage={getDashboardInitialPage()}
-        onSelectPublicSite={() => navigate('/')}
-      />
+      <ThemeProvider>
+        <ErrorBoundary>
+          <LoginPage />
+        </ErrorBoundary>
+      </ThemeProvider>
     );
   }
 
-  // Public Landing Page (/)
+  if (currentPath === '/docs') {
+    return (
+      <ThemeProvider>
+        <ErrorBoundary>
+          <DocsPage />
+        </ErrorBoundary>
+      </ThemeProvider>
+    );
+  }
+
+  if (currentPath === '/privacy') {
+    return (
+      <ThemeProvider>
+        <ErrorBoundary>
+          <PrivacyPolicyPage />
+        </ErrorBoundary>
+      </ThemeProvider>
+    );
+  }
+
+  if (currentPath === '/terms') {
+    return (
+      <ThemeProvider>
+        <ErrorBoundary>
+          <TermsOfServicePage />
+        </ErrorBoundary>
+      </ThemeProvider>
+    );
+  }
+
+  if (currentPath.startsWith('/dashboard')) {
+    return (
+      <ThemeProvider>
+        <ErrorBoundary>
+          <GlobalDashboardLayout
+            initialPage={getDashboardInitialPage()}
+            onSelectPublicSite={() => navigate('/')}
+          />
+        </ErrorBoundary>
+      </ThemeProvider>
+    );
+  }
+
+  if (currentPath !== '/' && currentPath !== '') {
+    return (
+      <ThemeProvider>
+        <ErrorBoundary>
+          <NotFoundPage />
+        </ErrorBoundary>
+      </ThemeProvider>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[#F7F2E8] text-[#242820] relative flex flex-col font-inter selection:bg-[#F47745]/20 selection:text-[#174C3B]">
-      <BackgroundDecoration />
-      <Navbar
-        activeTab={activeLandingTab}
-        onSelectTab={setActiveLandingTab}
-        onOpenLogin={() => navigate('/login')}
-        onOpenGetStarted={() => setIsGetStartedOpen(true)}
-      />
+    <ThemeProvider>
+      <ErrorBoundary>
+        <div className="min-h-screen bg-[#F7F2E8] dark:bg-[#123B2F] text-[#242820] dark:text-[#F7F2E8] relative flex flex-col font-inter selection:bg-[#F47745]/20 selection:text-[#174C3B] overflow-x-hidden transition-colors duration-300">
+          <BackgroundDecoration />
+          <Navbar
+            onOpenLogin={() => navigate('/login')}
+            onOpenGetStarted={() => navigate('/login')}
+          />
 
-      <main className="flex-1">
-        {activeLandingTab === 'loop' && (
-          <div className="animate-in fade-in duration-200">
-            <HeroSection
-              onOpenGetStarted={() => setIsGetStartedOpen(true)}
-              onOpenDocs={() => setIsDocsOpen(true)}
-            />
-            <TheLoopSection />
-          </div>
-        )}
+          <main className="flex-1">
+            <HeroSection />
 
-        {activeLandingTab === 'demo' && (
-          <div className="animate-in fade-in duration-200">
-            <LiveInspector />
-          </div>
-        )}
+            <section id="features" aria-label="Core Capabilities" className="scroll-mt-24">
+              <FeaturesSection />
+              <EnterpriseTrust />
+            </section>
 
-        {activeLandingTab === 'features' && (
-          <div className="animate-in fade-in duration-200">
-            <FeaturesSection />
-            <EnterpriseTrust />
-          </div>
-        )}
+            <section id="pricing" aria-label="Enterprise Pricing" className="scroll-mt-24">
+              <PricingSection onOpenGetStarted={() => navigate('/login')} />
+            </section>
+          </main>
 
-        {activeLandingTab === 'pricing' && (
-          <div className="animate-in fade-in duration-200">
-            <PricingSection onOpenGetStarted={() => setIsGetStartedOpen(true)} />
-          </div>
-        )}
-      </main>
+          <Footer
+            onSelectTab={setActiveLandingTab}
+            onOpenLogin={() => navigate('/login')}
+            onOpenGetStarted={() => navigate('/login')}
+            onOpenDocs={() => navigate('/docs')}
+          />
 
-      <Footer
-        onSelectTab={setActiveLandingTab}
-        onOpenLogin={() => navigate('/login')}
-        onOpenGetStarted={() => setIsGetStartedOpen(true)}
-        onOpenDocs={() => setIsDocsOpen(true)}
-      />
-
-      <GetStartedModal
-        isOpen={isGetStartedOpen}
-        onClose={() => setIsGetStartedOpen(false)}
-      />
-      <DocsModal isOpen={isDocsOpen} onClose={() => setIsDocsOpen(false)} />
-    </div>
+          <GetStartedModal
+            isOpen={isGetStartedOpen}
+            onClose={() => setIsGetStartedOpen(false)}
+          />
+          <DocsModal isOpen={isDocsOpen} onClose={() => setIsDocsOpen(false)} />
+        </div>
+      </ErrorBoundary>
+    </ThemeProvider>
   );
 }

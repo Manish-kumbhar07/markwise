@@ -18,6 +18,8 @@ import {
   getSeverityBadgeColors,
 } from '../../utils/dashboard';
 import { getRules, createRule, deleteRule } from '../../actions/rules';
+import { Skeleton } from '../ui/skeleton';
+import { SeverityIndicator } from './SeverityIndicator';
 
 export function BrandBrainPage() {
   const [rules, setRules] = useState<RuleCard[]>([]);
@@ -151,16 +153,14 @@ export function BrandBrainPage() {
         </div>
       </div>
 
-      {/* Main Two-Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        {/* LEFT COLUMN (1/3 width): Create Rule Form */}
-        <div className="lg:col-span-1 bg-[#FFFCF6] rounded-2xl border border-[#E8DFD0] p-6 shadow-xs sticky top-24">
-          <div className="flex items-center gap-2 pb-4 border-b border-[#E8DFD0]/70 mb-5">
-            <div className="p-2 rounded-xl bg-[#123B2F] text-[#F7F2E8]">
-              <Plus className="w-4 h-4" />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-6 items-start">
+        <div className="lg:col-span-1 bg-[#FFFCF6] rounded-xl border border-[#E8DFD0] p-4 sm:p-5 shadow-xs sticky top-20">
+          <div className="flex items-center gap-2 pb-3 border-b border-[#E8DFD0]/70 mb-4">
+            <div className="p-1.5 rounded-lg bg-[#123B2F] text-[#F7F2E8]">
+              <Plus className="w-3.5 h-3.5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-[#242820] font-inter">
+              <h2 className="text-sm sm:text-base font-bold text-[#242820] font-inter">
                 Create Governance Rule
               </h2>
               <p className="text-xs text-[#545B4E]">Commit a constraint to live enforcement</p>
@@ -168,7 +168,6 @@ export function BrandBrainPage() {
           </div>
 
           <form onSubmit={handleCreateRule} className="space-y-4">
-            {/* Error Message */}
             {formError && (
               <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2">
                 <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
@@ -176,7 +175,6 @@ export function BrandBrainPage() {
               </div>
             )}
 
-            {/* Success Message */}
             {successMessage && (
               <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-start gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
@@ -184,7 +182,6 @@ export function BrandBrainPage() {
               </div>
             )}
 
-            {/* Rule Title */}
             <div className="space-y-1.5">
               <label htmlFor="rule-title" className="block text-xs font-semibold text-[#123B2F]">
                 Rule Title
@@ -200,9 +197,7 @@ export function BrandBrainPage() {
               />
             </div>
 
-            {/* Type & Severity Grid */}
             <div className="grid grid-cols-2 gap-3">
-              {/* Rule Type */}
               <div className="space-y-1.5">
                 <label htmlFor="rule-type" className="block text-xs font-semibold text-[#123B2F]">
                   Rule Type
@@ -289,16 +284,36 @@ export function BrandBrainPage() {
           </div>
 
           {isLoading ? (
-            <div className="bg-[#FFFCF6] rounded-2xl border border-[#E8DFD0] p-12 text-center space-y-3">
-              <Loader2 className="w-6 h-6 text-[#123B2F] animate-spin mx-auto" />
-              <p className="text-xs text-[#7A8274]">Loading rules from the database...</p>
+            <div className="grid grid-cols-1 gap-3">
+              {[1, 2, 3].map((n) => (
+                <div
+                  key={n}
+                  className="bg-[#FFFCF6] dark:bg-[#164336] rounded-xl border border-[#E8DFD0] dark:border-[#205243] p-4 shadow-xs border-l-4 border-l-[#D5CDBD] space-y-3"
+                >
+                  <div className="flex items-center justify-between pb-2.5 border-b border-[#E8DFD0]/40">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-5 w-16 rounded-md" />
+                        <Skeleton className="h-5 w-20 rounded-md" />
+                      </div>
+                      <Skeleton className="h-5 w-48 sm:w-64 rounded-md" />
+                    </div>
+                    <Skeleton className="h-8 w-8 rounded-lg" />
+                  </div>
+                  <Skeleton className="h-10 w-full rounded-md" />
+                  <div className="flex items-center justify-between pt-1">
+                    <Skeleton className="h-3 w-28 rounded-md" />
+                    <Skeleton className="h-3 w-20 rounded-md" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : loadError ? (
             <div role="alert" className="bg-red-50 rounded-2xl border border-red-200 p-6 text-sm text-red-800">
               Could not load rules: {loadError}
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-3">
               {rules.map((rule) => {
                 const borderClass = getSeverityBorderClass(rule.severity);
                 const badgeColors = getSeverityBadgeColors(rule.severity);
@@ -306,22 +321,17 @@ export function BrandBrainPage() {
                 return (
                   <div
                     key={rule.id}
-                    className={`bg-[#FFFCF6] rounded-2xl border border-[#E8DFD0] p-6 shadow-xs border-l-4 ${borderClass} space-y-4 hover:border-[#123B2F]/30 transition-all duration-200 group`}
+                    className={`bg-[#FFFCF6] rounded-xl border border-[#E8DFD0] p-4 shadow-xs border-l-4 ${borderClass} space-y-3 hover:border-[#123B2F]/30 transition-all duration-200 group`}
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E8DFD0]/40 pb-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-[#E8DFD0]/40 pb-2.5">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span
-                            className={`font-mono text-[11px] font-bold px-2 py-0.5 rounded-md border flex items-center gap-1.5 ${badgeColors.bg} ${badgeColors.text} ${badgeColors.border}`}
-                          >
-                            <span className={`w-1.5 h-1.5 rounded-full ${badgeColors.dot}`} />
-                            {rule.severity}
-                          </span>
-                          <span className="font-mono text-[11px] font-semibold text-[#7A8274] uppercase tracking-wider bg-[#F7F2E8] px-2 py-0.5 rounded border border-[#E8DFD0]">
+                          <SeverityIndicator severity={rule.severity} />
+                          <span className="font-mono text-[10px] font-semibold text-[#7A8274] uppercase tracking-wider bg-[#F7F2E8] px-2 py-0.5 rounded border border-[#E8DFD0]">
                             {rule.type}
                           </span>
                         </div>
-                        <h3 className="text-base font-bold text-[#242820] font-inter pt-1">
+                        <h3 className="text-sm sm:text-base font-bold text-[#242820] font-inter pt-1">
                           {rule.title}
                         </h3>
                       </div>
@@ -332,15 +342,15 @@ export function BrandBrainPage() {
                         title="Archive Rule"
                         className="text-[#7A8274] hover:text-red-600 p-1 rounded-lg hover:bg-red-50 transition-colors opacity-60 group-hover:opacity-100 self-end sm:self-auto cursor-pointer"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
 
-                    <div className="bg-[#F7F2E8]/70 rounded-xl p-4 border border-[#E8DFD0]/70 text-xs text-[#545B4E] leading-relaxed">
-                      <span className="font-mono font-semibold text-[#123B2F] block mb-1 text-[11px] uppercase tracking-wider">
+                    <div className="bg-[#F7F2E8]/70 rounded-lg p-3 border border-[#E8DFD0]/70 text-xs text-[#545B4E] leading-snug">
+                      <span className="font-mono font-semibold text-[#123B2F] block mb-1 text-[10px] uppercase tracking-wider">
                         Definition & Scope:
                       </span>
-                      <p className="text-sm font-normal text-[#242820]">
+                      <p className="text-xs font-normal text-[#242820] leading-snug">
                         {rule.definition}
                       </p>
                     </div>

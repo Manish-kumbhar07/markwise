@@ -15,7 +15,7 @@ export async function cookies() {
     has(name: string) {
       return !!this.get(name);
     },
-    set(name: string | { name: string; value: string }, value?: string) {
+    set(name: string | { name: string; value: string }, value?: string, _options?: any) {
       if (typeof document === 'undefined') return;
       if (typeof name === 'object') {
         document.cookie = `${name.name}=${encodeURIComponent(name.value)}; path=/`;

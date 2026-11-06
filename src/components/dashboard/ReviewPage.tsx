@@ -4,6 +4,7 @@ import {
   Check,
   CheckCircle2,
   AlertTriangle,
+  AlertCircle,
   RotateCcw,
   Edit3,
   X,
@@ -21,7 +22,10 @@ import {
   runAIReview,
   acceptIssue,
   type ReviewIssueResult,
-} from '@/app/actions/review';
+} from '@/actions/review';
+import { IssueCard } from '@/components/IssueCard';
+import { Skeleton } from '@/components/ui/skeleton';
+import { StatusBadge } from './StatusBadge';
 
 export function ReviewPage() {
   const [contentId, setContentId] = useState<string>('');
@@ -32,8 +36,21 @@ export function ReviewPage() {
   );
   const [issues, setIssues] = useState<ReviewIssueResult[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [scanNotification, setScanNotification] = useState<string | null>(null);
+  const [toastNotification, setToastNotification] = useState<{
+    type: 'success' | 'error' | 'info';
+    title: string;
+    description?: string;
+  } | null>(null);
   const [isEditorMode, setIsEditorMode] = useState<boolean>(false);
+
+  // Auto-dismiss toast notification after 7 seconds
+  useEffect(() => {
+    if (!toastNotification) return;
+    const timer = setTimeout(() => {
+      setToastNotification(null);
+    }, 7000);
+    return () => clearTimeout(timer);
+  }, [toastNotification]);
 
   // useTransition for running AI review and accepting issues
   const [isPending, startTransition] = useTransition();
@@ -57,9 +74,11 @@ export function ReviewPage() {
       setIssues(data.issues || []);
     } catch (err: unknown) {
       console.error('Failed to load review content:', err);
-      setScanNotification(
-        err instanceof Error ? err.message : 'Failed to connect to review database'
-      );
+      setToastNotification({
+        type: 'error',
+        title: 'Failed to connect to review database',
+        description: err instanceof Error ? err.message : undefined,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -69,10 +88,10 @@ export function ReviewPage() {
     void loadContent();
   }, []);
 
-  // Run AI Review using OpenAI & Prisma
+  // Run AI Review using Gemini & Prisma
   const handleRunAiReview = () => {
     if (!contentId) return;
-    setScanNotification(null);
+    setToastNotification(null);
 
     startTransition(async () => {
       try {
@@ -86,15 +105,23 @@ export function ReviewPage() {
         const newIssues = await runAIReview(contentId);
         setIssues(newIssues);
         setContentStatus('IN_REVIEW');
-        setScanNotification(
-          `AI Review Complete: ${newIssues.length} issue${
+        setToastNotification({
+          type: 'success',
+          title: `AI Review Complete: ${newIssues.length} issue${
             newIssues.length === 1 ? '' : 's'
-          } identified by Brand Governance model.`
-        );
+          } identified by Brand Governance model.`,
+        });
       } catch (err: unknown) {
-        const errorDetail =
-          err instanceof Error ? err.message : 'An error occurred during AI review';
-        setScanNotification(`AI Review Error: ${errorDetail}`);
+        console.error('[AI Review Graceful Fallback]:', err);
+        const errorDetail = err instanceof Error ? err.message : '';
+        setToastNotification({
+          type: 'error',
+          title: 'AI Review failed. Please try again in a moment.',
+          description:
+            errorDetail && !errorDetail.toLowerCase().includes('failed')
+              ? errorDetail
+              : 'The Brand Governance AI engine could not complete the request. Your draft is preserved.',
+        });
       }
     });
   };
@@ -134,11 +161,18 @@ export function ReviewPage() {
             iss.id === issue.id ? { ...iss, status: 'ACCEPTED' } : iss
           )
         );
-        setScanNotification(`Fix applied: "${issue.suggestedFix}"`);
+        setToastNotification({
+          type: 'success',
+          title: `Fix applied: "${issue.suggestedFix}"`,
+        });
       } catch (err: unknown) {
         const errorDetail =
           err instanceof Error ? err.message : 'Failed to apply suggested fix';
-        setScanNotification(`Error: ${errorDetail}`);
+        setToastNotification({
+          type: 'error',
+          title: 'Failed to apply suggested fix',
+          description: errorDetail,
+        });
       }
     });
   };
@@ -151,7 +185,10 @@ export function ReviewPage() {
       )
     );
     setActiveModal(null);
-    setScanNotification('Issue override recorded in audit logs.');
+    setToastNotification({
+      type: 'info',
+      title: 'Issue override recorded in audit logs.',
+    });
   };
 
   // Save custom edit
@@ -178,11 +215,18 @@ export function ReviewPage() {
           )
         );
         setActiveModal(null);
-        setScanNotification('Custom revision saved and applied.');
+        setToastNotification({
+          type: 'success',
+          title: 'Custom revision saved and applied.',
+        });
       } catch (err: unknown) {
         const errorDetail =
           err instanceof Error ? err.message : 'Failed to save custom revision';
-        setScanNotification(`Error: ${errorDetail}`);
+        setToastNotification({
+          type: 'error',
+          title: 'Failed to save revision',
+          description: errorDetail,
+        });
       }
     });
   };
@@ -192,7 +236,7 @@ export function ReviewPage() {
     const defaultText =
       'Our platform guarantees the fastest performance on the market.';
     setDraftContent(defaultText);
-    setScanNotification(null);
+    setToastNotification(null);
     if (contentId) {
       await fetch('/api/review/content', {
         method: 'POST',
@@ -211,58 +255,46 @@ export function ReviewPage() {
   const charCount = draftContent.length;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-200">
+    <div className="space-y-5 animate-in fade-in duration-200">
       {/* TOP BAR: Draft Title, Status Badge, and large "Run AI Review" Button */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E8DFD0]">
-        <div className="space-y-1">
-          <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#242820] font-inter">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E8DFD0]">
+        <div className="space-y-0.5">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#242820] font-inter">
               {contentTitle}
             </h1>
 
-            {/* Status Badge */}
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#123B2F]/10 text-[#123B2F] border border-[#123B2F]/20 shadow-2xs">
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${
-                  contentStatus === 'IN_REVIEW'
-                    ? 'bg-[#123B2F] animate-pulse'
-                    : 'bg-amber-600'
-                }`}
-              />
-              {contentStatus === 'IN_REVIEW' ? 'In Review' : 'Draft'}
-            </span>
+            <StatusBadge status={contentStatus} />
           </div>
-          <p className="text-xs sm:text-sm text-[#545B4E]">
+          <p className="text-xs text-[#545B4E]">
             Marketing campaign ingestion · Channel: LinkedIn & X (Twitter) · Pre-publish governance
           </p>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2.5 shrink-0">
           <button
             type="button"
             onClick={handleResetDraft}
-            title="Reset to Demo Text"
-            className="p-2.5 rounded-xl border border-[#E8DFD0] bg-[#FFFCF6] hover:bg-[#FAF6EF] text-[#545B4E] hover:text-[#242820] transition-colors cursor-pointer shadow-2xs"
+            title="Reset to Baseline Draft"
+            className="p-2 rounded-lg border border-[#E8DFD0] bg-[#FFFCF6] hover:bg-[#FAF6EF] text-[#545B4E] hover:text-[#242820] transition-colors cursor-pointer shadow-2xs"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-3.5 h-3.5" />
           </button>
 
-          {/* Large "Run AI Review" Button */}
           <button
             type="button"
             onClick={handleRunAiReview}
             disabled={isPending || isLoading}
-            className="px-5 py-3 rounded-xl bg-[#123B2F] hover:bg-[#0c2921] active:scale-[0.98] text-white text-sm font-semibold flex items-center gap-2.5 shadow-sm transition-all duration-150 cursor-pointer disabled:opacity-75"
+            className="px-4 py-2.5 rounded-lg bg-[#123B2F] hover:bg-[#0c2921] active:scale-[0.98] text-white text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-xs transition-all duration-150 cursor-pointer disabled:opacity-75"
           >
             {isPending ? (
               <>
-                <Loader2 className="w-4 h-4 text-[#F47745] animate-spin" />
+                <Loader2 className="w-3.5 h-3.5 text-[#F47745] animate-spin" />
                 <span>Analyzing...</span>
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4 text-[#F47745]" />
+                <Sparkles className="w-3.5 h-3.5 text-[#F47745]" />
                 <span>Run AI Review</span>
               </>
             )}
@@ -270,37 +302,68 @@ export function ReviewPage() {
         </div>
       </div>
 
-      {/* Temporary Scan Notification Toast */}
-      {scanNotification && (
+      {toastNotification && (
         <div
-          className={`p-3.5 rounded-xl border text-xs font-semibold flex items-center justify-between shadow-xs animate-in slide-in-from-top-2 ${
-            scanNotification.includes('Error')
-              ? 'bg-red-50 border-red-200 text-red-700'
-              : 'bg-[#FFFCF6] border-[#123B2F]/20 text-[#123B2F]'
+          role="alert"
+          className={`p-4 rounded-xl border flex items-start justify-between shadow-md transition-all duration-200 animate-in slide-in-from-top-2 ${
+            toastNotification.type === 'error'
+              ? 'bg-[#FFF7F4] dark:bg-[#251714] border-2 border-[#F47745] text-[#242820] dark:text-[#FFFCF6] ring-1 ring-[#F47745]/30'
+              : toastNotification.type === 'info'
+              ? 'bg-[#F2F6FA] dark:bg-[#162734] border border-[#BACDD9] text-[#1D3557] dark:text-[#E0EBF3]'
+              : 'bg-[#FFFCF6] dark:bg-[#164336] border border-[#123B2F]/20 dark:border-[#205243] text-[#123B2F] dark:text-[#F7F2E8]'
           }`}
         >
-          <div className="flex items-center gap-2">
-            {scanNotification.includes('Error') ? (
-              <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+          <div className="flex items-start gap-3">
+            {toastNotification.type === 'error' ? (
+              <div className="w-8 h-8 rounded-lg bg-[#F47745]/15 border border-[#F47745]/40 flex items-center justify-center text-[#F47745] shrink-0 mt-0.5">
+                <AlertCircle className="w-5 h-5 stroke-[2.4]" />
+              </div>
+            ) : toastNotification.type === 'info' ? (
+              <div className="w-8 h-8 rounded-lg bg-[#2E6F9E]/15 border border-[#2E6F9E]/40 flex items-center justify-center text-[#2E6F9E] shrink-0 mt-0.5">
+                <FileText className="w-4 h-4 stroke-[2]" />
+              </div>
             ) : (
-              <Sparkles className="w-4 h-4 text-[#F47745] shrink-0" />
+              <div className="w-8 h-8 rounded-lg bg-[#123B2F]/10 dark:bg-[#E5EEDC]/10 border border-[#123B2F]/20 flex items-center justify-center text-[#123B2F] dark:text-[#E5EEDC] shrink-0 mt-0.5">
+                <Sparkles className="w-4 h-4 text-[#F47745]" />
+              </div>
             )}
-            <span className="leading-relaxed">{scanNotification}</span>
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`text-xs sm:text-sm font-semibold tracking-tight ${
+                    toastNotification.type === 'error'
+                      ? 'text-[#C84B1A] dark:text-[#FF9D79]'
+                      : 'text-[#123B2F] dark:text-[#FFFCF6]'
+                  }`}
+                >
+                  {toastNotification.title}
+                </span>
+                {toastNotification.type === 'error' && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F47745] text-white uppercase tracking-wider">
+                    Notice
+                  </span>
+                )}
+              </div>
+              {toastNotification.description && (
+                <p className="text-xs text-[#545B4E] dark:text-[#C5D3C1] leading-relaxed">
+                  {toastNotification.description}
+                </p>
+              )}
+            </div>
           </div>
           <button
             type="button"
-            onClick={() => setScanNotification(null)}
-            className="text-[#7A8274] hover:text-[#242820] p-1 cursor-pointer ml-2"
+            onClick={() => setToastNotification(null)}
+            className="text-[#7A8274] hover:text-[#242820] dark:hover:text-white p-1 rounded-md transition-colors cursor-pointer shrink-0 ml-3"
+            aria-label="Dismiss notification"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      {/* SPLIT SCREEN LAYOUT: Left (60%) Content Editor, Right (40%) Issue Panel */}
-      <div className="flex flex-col lg:flex-row gap-8 items-start">
-        {/* LEFT SIDE (60%): The Content Editor */}
-        <div className="w-full lg:w-[60%] flex flex-col space-y-4">
+      <div className="flex flex-col md:flex-row gap-5 md:gap-6 items-start">
+        <div className="w-full md:w-[60%] flex flex-col space-y-3">
           <div className="flex items-center justify-between text-xs text-[#7A8274] px-1">
             <span className="font-mono uppercase tracking-wider font-semibold text-[#545B4E]">
               Content Editor Viewport (Prisma Content ID: {contentId.slice(0, 10)}...)
@@ -314,10 +377,8 @@ export function ReviewPage() {
             </button>
           </div>
 
-          {/* Large White Card with Text Draft */}
-          <div className="w-full bg-white rounded-2xl border border-[#E8DFD0] shadow-xs p-6 sm:p-8 flex flex-col justify-between min-h-[460px] relative transition-all">
-            {/* Editor Toolbar Header */}
-            <div className="flex items-center justify-between border-b border-[#E8DFD0]/70 pb-4 mb-6">
+          <div className="w-full bg-white rounded-xl border border-[#E8DFD0] shadow-xs p-4 sm:p-5 flex flex-col justify-between min-h-[380px] relative transition-all">
+            <div className="flex items-center justify-between border-b border-[#E8DFD0]/70 pb-3 mb-4">
               <div className="flex items-center gap-1 text-[#545B4E]">
                 <button
                   type="button"
@@ -366,7 +427,14 @@ export function ReviewPage() {
 
             {/* Document Draft Text Rendering or Editable Textarea */}
             <div className="flex-1 py-4">
-              {isEditorMode ? (
+              {isLoading ? (
+                <div className="space-y-3 py-2">
+                  <Skeleton className="h-6 w-3/4 rounded-md" />
+                  <Skeleton className="h-6 w-full rounded-md" />
+                  <Skeleton className="h-6 w-5/6 rounded-md" />
+                  <Skeleton className="h-6 w-2/3 rounded-md" />
+                </div>
+              ) : isEditorMode ? (
                 <textarea
                   rows={8}
                   value={draftContent}
@@ -432,8 +500,7 @@ export function ReviewPage() {
           </div>
         </div>
 
-        {/* RIGHT SIDE (40%): The Real Issue Panel */}
-        <div className="w-full lg:w-[40%] flex flex-col space-y-4">
+        <div className="w-full md:w-[40%] flex flex-col space-y-4">
           <div className="flex items-center justify-between text-xs text-[#7A8274] px-1">
             <span className="font-mono uppercase tracking-wider font-semibold text-[#545B4E]">
               Governance Issues ({issues.length} Total)
@@ -443,12 +510,29 @@ export function ReviewPage() {
             </span>
           </div>
 
-          {/* Render Real Database Issues or Empty State */}
           <div className="space-y-4">
             {isLoading ? (
-              <div className="bg-[#FFFCF6] rounded-2xl border border-[#E8DFD0] p-8 text-center text-xs text-[#7A8274] flex flex-col items-center justify-center gap-3">
-                <Loader2 className="w-6 h-6 text-[#123B2F] animate-spin" />
-                <span>Loading review records from Prisma database...</span>
+              <div className="space-y-4">
+                {[1, 2].map((n) => (
+                  <div
+                    key={n}
+                    className="bg-[#FFFCF6] dark:bg-[#164336] rounded-xl border border-[#E8DFD0] dark:border-[#205243] p-4 sm:p-5 shadow-xs space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-5 w-16 rounded-md" />
+                        <Skeleton className="h-5 w-24 rounded-md" />
+                      </div>
+                      <Skeleton className="h-5 w-16 rounded-md" />
+                    </div>
+                    <Skeleton className="h-5 w-48 rounded-md" />
+                    <Skeleton className="h-14 w-full rounded-md" />
+                    <div className="pt-2 flex items-center gap-2">
+                      <Skeleton className="h-9 flex-1 rounded-xl" />
+                      <Skeleton className="h-9 w-20 rounded-xl" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : issues.length === 0 ? (
               <div className="bg-[#FFFCF6] rounded-2xl border border-[#E8DFD0] p-8 text-center space-y-3">
@@ -457,162 +541,43 @@ export function ReviewPage() {
                 </div>
                 <h3 className="text-sm font-bold text-[#242820]">No Issues Detected Yet</h3>
                 <p className="text-xs text-[#545B4E] leading-relaxed max-w-xs mx-auto">
-                  Click <strong>&quot;Run AI Review&quot;</strong> above to scan your draft text against all active Brand Rules via OpenAI.
+                  Click <strong>&quot;Run AI Review&quot;</strong> above to scan your draft text against all active brand rules.
                 </p>
               </div>
             ) : (
-              issues.map((issue) => {
-                const isHigh = issue.severity === 'HIGH';
-                const isAccepted = issue.status === 'ACCEPTED';
-                const isOverridden = issue.status === 'OVERRIDDEN';
-
-                return (
-                  <div
-                    key={issue.id}
-                    className={`bg-[#FFFCF6] rounded-2xl border transition-all duration-200 p-6 shadow-xs space-y-4 ${
-                      isAccepted
-                        ? 'border-emerald-300 ring-1 ring-emerald-200'
-                        : isOverridden
-                        ? 'border-stone-300 opacity-75'
-                        : 'border-[#E8DFD0] hover:border-[#123B2F]/40'
-                    }`}
-                  >
-                    {/* Top: Severity Badge & Rule Info */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold border tracking-wider uppercase ${
-                            isHigh
-                              ? 'bg-red-50 text-red-700 border-red-200'
-                              : 'bg-amber-50 text-amber-800 border-amber-200'
-                          }`}
-                        >
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              isHigh ? 'bg-red-500' : 'bg-amber-500'
-                            }`}
-                          />
-                          {issue.severity}
-                        </span>
-
-                        <span className="font-mono text-xs font-semibold text-[#123B2F] bg-[#123B2F]/10 px-2 py-0.5 rounded border border-[#123B2F]/15">
-                          {issue.ruleTitle}
-                        </span>
-                      </div>
-
-                      {/* Status indicator if resolved */}
-                      {isAccepted && (
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                          <Check className="w-3 h-3" />
-                          Accepted
-                        </span>
-                      )}
-                      {isOverridden && (
-                        <span className="inline-flex items-center gap-1 text-xs font-medium text-stone-600 bg-stone-100 px-2.5 py-0.5 rounded-full border border-stone-200">
-                          Overridden
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Title */}
-                    <h3 className="text-base font-bold text-[#242820] font-inter">
-                      {issue.ruleTitle}
-                    </h3>
-
-                    {/* WHY & RULE Metadata Grid */}
-                    <div className="space-y-2 text-xs">
-                      {/* WHY */}
-                      <div className="bg-[#F7F2E8]/80 rounded-xl p-3 border border-[#E8DFD0]/70">
-                        <span className="font-mono text-[10px] uppercase tracking-wider font-bold text-[#7A8274] block mb-0.5">
-                          WHY:
-                        </span>
-                        <p className="text-[#545B4E] leading-relaxed">{issue.why}</p>
-                      </div>
-
-                      {/* RULE ID */}
-                      <div className="flex items-center justify-between text-xs px-1">
-                        <span className="font-mono text-[10px] uppercase tracking-wider font-bold text-[#7A8274]">
-                          RULE RECORD:
-                        </span>
-                        <span className="font-mono text-xs font-bold text-[#123B2F]">
-                          {issue.ruleId ? issue.ruleId.slice(0, 16) : 'Brand Safety Codex'}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* SUGGESTED FIX BOX: Pale sage-green background (#E5EEDC) */}
-                    {issue.suggestedFix && (
-                      <div className="bg-[#E5EEDC] rounded-xl p-3.5 border border-[#d0dfc4] space-y-1.5 shadow-2xs">
-                        <span className="font-mono text-[10px] uppercase tracking-wider font-bold text-[#123B2F] flex items-center gap-1">
-                          <Sparkles className="w-3 h-3 text-[#123B2F]" />
-                          Suggested Compliant Fix
-                        </span>
-                        <p className="text-xs text-[#242820] font-medium leading-relaxed">
-                          &ldquo;{issue.suggestedFix}&rdquo;
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Action Buttons: Accept / Edit / Override */}
-                    <div className="pt-2 border-t border-[#E8DFD0]/60 flex flex-wrap items-center justify-between gap-3">
-                      <div className="flex items-center gap-2">
-                        {/* Accept Button */}
-                        <button
-                          type="button"
-                          onClick={() => handleAcceptFix(issue)}
-                          disabled={isAccepted || isPending}
-                          className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer shadow-2xs flex items-center gap-1.5 ${
-                            isAccepted
-                              ? 'bg-emerald-700 text-white cursor-default'
-                              : 'bg-[#123B2F] hover:bg-[#0c2921] active:scale-[0.97] text-white disabled:opacity-70'
-                          }`}
-                        >
-                          <Check className="w-3.5 h-3.5" />
-                          <span>{isAccepted ? 'Applied' : 'Accept'}</span>
-                        </button>
-
-                        {/* Edit Button */}
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setActiveModal({
-                              type: 'edit',
-                              issueId: issue.id,
-                              textValue: issue.suggestedFix,
-                            })
-                          }
-                          disabled={isAccepted || isPending}
-                          className="px-3 py-1.5 rounded-xl text-xs font-semibold text-[#545B4E] hover:text-[#123B2F] hover:bg-[#123B2F]/10 transition-colors cursor-pointer disabled:opacity-50"
-                        >
-                          Edit
-                        </button>
-
-                        {/* Override Button */}
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setActiveModal({
-                              type: 'override',
-                              issueId: issue.id,
-                              textValue: '',
-                            })
-                          }
-                          disabled={isOverridden || isAccepted || isPending}
-                          className="px-3 py-1.5 rounded-xl text-xs font-semibold border border-[#E8DFD0] hover:border-[#123B2F] text-[#545B4E] hover:text-[#123B2F] bg-transparent transition-colors cursor-pointer disabled:opacity-50"
-                        >
-                          Override
-                        </button>
-                      </div>
-
-                      {/* AI-Assisted Pill Badge */}
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#EDE5F7] text-[#5B21B6] border border-[#DDD0F0] shadow-2xs shrink-0 font-inter">
-                        <span>✨</span>
-                        <span>AI-assisted</span>
-                      </span>
-                    </div>
-                  </div>
-                );
-              })
+              issues.map((issue) => (
+                <IssueCard
+                  key={issue.id}
+                  issue={issue}
+                  isPending={isPending}
+                  onAccept={handleAcceptFix}
+                  onEdit={(iss) =>
+                    setActiveModal({
+                      type: 'edit',
+                      issueId: iss.id,
+                      textValue: iss.suggestedFix,
+                    })
+                  }
+                  onOverride={(iss) =>
+                    setActiveModal({
+                      type: 'override',
+                      issueId: iss.id,
+                      textValue: '',
+                    })
+                  }
+                  onRuleCreated={(issueId, ruleTitle) => {
+                    setIssues((prev) =>
+                      prev.map((i) =>
+                        i.id === issueId ? { ...i, status: 'RULE_CREATED' } : i
+                      )
+                    );
+                    setToastNotification({
+                      type: 'success',
+                      title: `Rule "${ruleTitle}" successfully saved to Brand Brain!`,
+                    });
+                  }}
+                />
+              ))
             )}
           </div>
         </div>

@@ -141,7 +141,6 @@ export function FactVaultPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-200">
-      {/* Header with Forest Green "Add Fact" Button */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2 border-b border-[#E8DFD0]">
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#123B2F] mb-1">
@@ -156,7 +155,6 @@ export function FactVaultPage() {
           </p>
         </div>
 
-        {/* "Add Fact" Button (Forest Green) */}
         <button
           type="button"
           onClick={() => setIsAddModalOpen(true)}
@@ -167,9 +165,7 @@ export function FactVaultPage() {
         </button>
       </div>
 
-      {/* Main Fact Table Card */}
       <div className="bg-[#FFFCF6] rounded-2xl border border-[#E8DFD0] p-6 shadow-xs space-y-4">
-        {/* Table Top Toolbar */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7A8274]" />
@@ -188,7 +184,6 @@ export function FactVaultPage() {
           </div>
         </div>
 
-        {/* Facts Table */}
         {loadError && (
           <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-800">
             Could not load facts: {loadError}

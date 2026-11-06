@@ -10,14 +10,20 @@ import {
   AlertTriangle,
   FileCheck2,
   ExternalLink,
+  Menu,
 } from 'lucide-react';
 
 interface HeaderProps {
   onOpenRunReview: () => void;
   onSelectPublicSite?: () => void;
+  onToggleMobileSidebar?: () => void;
 }
 
-export function Header({ onOpenRunReview, onSelectPublicSite }: HeaderProps) {
+export function Header({
+  onOpenRunReview,
+  onSelectPublicSite,
+  onToggleMobileSidebar,
+}: HeaderProps) {
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [selectedWorkspace, setSelectedWorkspace] = useState('My Workspace');
@@ -70,9 +76,19 @@ export function Header({ onOpenRunReview, onSelectPublicSite }: HeaderProps) {
   }, []);
 
   return (
-    <header className="h-16 bg-[#FFFCF6] border-b border-[#E8DFD0] px-6 sm:px-8 flex items-center justify-between sticky top-0 z-20 shadow-2xs">
-      {/* Left: Workspace Switcher Dropdown */}
-      <div className="flex items-center gap-4">
+    <header className="h-14 bg-[#FFFCF6] border-b border-[#E8DFD0] px-4 sm:px-6 flex items-center justify-between sticky top-0 z-20 shadow-2xs">
+      {/* Left: Mobile Menu Button & Workspace Switcher */}
+      <div className="flex items-center gap-2 sm:gap-4">
+        {onToggleMobileSidebar && (
+          <button
+            type="button"
+            onClick={onToggleMobileSidebar}
+            className="p-1.5 rounded-lg border border-[#E8DFD0] bg-[#F7F2E8] hover:bg-[#FAF6EF] text-[#123B2F] md:hidden cursor-pointer shadow-2xs"
+            aria-label="Toggle Navigation Menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        )}
         <div className="relative" ref={workspaceRef}>
           <button
             type="button"
@@ -231,17 +247,17 @@ export function Header({ onOpenRunReview, onSelectPublicSite }: HeaderProps) {
         {/* User Profile Avatar in Header */}
         <div
           className="flex items-center gap-2 pl-1 cursor-pointer group"
-          title="Sarah Jenkins (s.jenkins@markwise.com)"
+          title="Elena Rostova (e.rostova@markwise.ai)"
         >
           <div className="w-9 h-9 rounded-full bg-[#F47745] text-white font-bold text-xs flex items-center justify-center ring-2 ring-[#E8DFD0] group-hover:ring-[#123B2F] transition-all shadow-2xs">
-            SJ
+            ER
           </div>
           <div className="hidden lg:flex flex-col text-left">
             <span className="text-xs font-semibold text-[#242820] leading-tight group-hover:text-[#123B2F] transition-colors">
-              Sarah Jenkins
+              Elena Rostova
             </span>
             <span className="text-[10px] font-mono text-[#7A8274] leading-tight">
-              Compliance Lead
+              VP Brand Governance
             </span>
           </div>
         </div>

@@ -152,8 +152,26 @@ export function Footer({
             &copy; {new Date().getFullYear()} Markwise Technologies Inc. All rights reserved.
           </div>
           <div className="flex items-center gap-6">
-            <span className="text-[#7A8274]">Privacy Policy</span>
-            <span className="text-[#7A8274]">Terms of Service</span>
+            <button
+              type="button"
+              onClick={() => {
+                window.history.pushState({}, '', '/privacy');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+              }}
+              className="text-[#7A8274] hover:text-[#174C3B] hover:underline cursor-pointer"
+            >
+              Privacy Policy
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                window.history.pushState({}, '', '/terms');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+              }}
+              className="text-[#7A8274] hover:text-[#174C3B] hover:underline cursor-pointer"
+            >
+              Terms of Service
+            </button>
             <span className="text-[#7A8274]">Security Trust Center</span>
           </div>
         </div>

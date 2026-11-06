@@ -93,7 +93,7 @@ export function GetStartedModal({ isOpen, onClose }: GetStartedModalProps) {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g. Sarah Jenkins"
+                  placeholder="e.g. Elena Rostova"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#E8DFD0] bg-white text-sm text-[#242820] placeholder-[#7A8274]/60 focus:outline-none focus:ring-2 focus:ring-[#174C3B]/20 focus:border-[#174C3B]"
                 />
               </div>

@@ -1,3 +1,11 @@
+declare module 'next' {
+  export interface Metadata {
+    title?: string;
+    description?: string;
+    [key: string]: unknown;
+  }
+}
+
 declare module 'next/server' {
   export interface RequestCookie {
     name: string;
@@ -68,4 +76,35 @@ declare module 'next/headers' {
 
   export function cookies(): Promise<ReadonlyRequestCookies>;
   export function headers(): Promise<Headers>;
+}
+
+declare module 'next/image' {
+  import type { ComponentType, ImgHTMLAttributes } from 'react';
+
+  export interface ImageProps extends ImgHTMLAttributes<HTMLImageElement> {
+    src: string;
+    alt: string;
+    width?: number | string;
+    height?: number | string;
+    priority?: boolean;
+    quality?: number;
+  }
+
+  const Image: ComponentType<ImageProps>;
+  export default Image;
+}
+
+declare module 'next/link' {
+  import type { ComponentType, AnchorHTMLAttributes, ReactNode } from 'react';
+
+  export interface LinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
+    href: string;
+    children?: ReactNode;
+    replace?: boolean;
+    scroll?: boolean;
+    prefetch?: boolean;
+  }
+
+  const Link: ComponentType<LinkProps>;
+  export default Link;
 }
