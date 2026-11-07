@@ -1,4 +1,6 @@
-import { useState } from 'react';
+'use client';
+
+import { useState, useEffect } from 'react';
 import {
   LayoutDashboard,
   BarChart2,
@@ -29,13 +31,23 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
   const [isAccepted, setIsAccepted] = useState(false);
   const [showCorrectionToast, setShowCorrectionToast] = useState(false);
 
+  // 1.5-second simulated loading state
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isLoading) {
+      timer = setTimeout(() => {
+        setIsLoading(false);
+        setHasRunReview(true);
+        setIsAccepted(false);
+      }, 1500);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [isLoading]);
+
   const handleRunReview = () => {
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      setHasRunReview(true);
-      setIsAccepted(false);
-    }, 1500);
   };
 
   const handleApplyFix = () => {
@@ -48,6 +60,7 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
   };
 
   const handleReset = () => {
+    setIsLoading(false);
     setInputText(DEFAULT_DEMO_TEXT);
     setHasRunReview(false);
     setIsAccepted(false);
@@ -70,13 +83,27 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
           </div>
 
           {/* Window Center Title */}
-          <div className="text-[11px] font-medium text-[#5A6355] font-sans tracking-tight">
+          <div className="text-[11px] font-medium text-[#5A6355] font-sans tracking-tight hidden sm:block">
             Markwise — Interactive Governance Sandbox
           </div>
+          <div className="text-[11px] font-medium text-[#5A6355] font-sans tracking-tight sm:hidden">
+            Governance Sandbox
+          </div>
 
-          {/* Window Version / Tag */}
-          <div className="text-[10px] font-mono text-[#123B2F] font-semibold bg-[#123B2F]/10 px-1.5 py-0.5 rounded">
-            Live Demo
+          {/* Window Actions: Reset Demo + Version Tag */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleReset}
+              title="Reset sandbox to initial state"
+              className="text-[10px] font-mono font-medium text-[#5A6355] hover:text-[#123B2F] bg-white/70 hover:bg-white border border-[#D5CDBD] px-2 py-0.5 rounded-md transition-all flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95 focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
+            >
+              <RotateCcw aria-hidden="true" className="w-2.5 h-2.5" />
+              <span>Reset Demo</span>
+            </button>
+            <div className="text-[10px] font-mono text-[#123B2F] font-semibold bg-[#123B2F]/10 px-1.5 py-0.5 rounded">
+              Live Demo
+            </div>
           </div>
         </div>
 
@@ -139,29 +166,42 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
             {/* Column 2: Center Editor Pane (Hidden on screens < md to prioritize Issue Card readability) */}
             <div className="hidden md:flex md:col-span-5 bg-[#FAF7F2] p-3 flex-col justify-between border-r border-[#E8DFD0]">
               <div>
-                {/* Draft Header & Run Review Button */}
+                {/* Draft Header & Action Buttons */}
                 <div className="flex items-center justify-between pb-2 border-b border-[#E8DFD0]">
                   <div className="text-xs font-semibold text-[#123B2F] truncate">
                     Draft Content Editor
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleRunReview}
-                    disabled={isLoading}
-                    className="px-2.5 py-1 text-[10px] font-semibold text-white bg-[#123B2F] hover:bg-[#0c2921] active:scale-95 rounded-lg transition-all flex items-center gap-1 cursor-pointer shadow-2xs disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 aria-hidden="true" className="w-3 h-3 animate-spin text-[#F47745]" />
-                        <span>Auditing...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles aria-hidden="true" className="w-3 h-3 text-[#F47745]" />
-                        <span>Run Review</span>
-                      </>
+                  <div className="flex items-center gap-1.5">
+                    {(hasRunReview || isAccepted || inputText !== DEFAULT_DEMO_TEXT) && (
+                      <button
+                        type="button"
+                        onClick={handleReset}
+                        className="px-2 py-1 text-[10px] font-mono text-[#5A6355] hover:text-[#123B2F] border border-[#E8DFD0] hover:bg-white rounded-lg transition-all flex items-center gap-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
+                        title="Reset Demo"
+                      >
+                        <RotateCcw aria-hidden="true" className="w-2.5 h-2.5" />
+                        <span>Reset</span>
+                      </button>
                     )}
-                  </button>
+                    <button
+                      type="button"
+                      onClick={handleRunReview}
+                      disabled={isLoading}
+                      className="px-2.5 py-1 text-[10px] font-semibold text-white bg-[#123B2F] hover:bg-[#0c2921] active:scale-95 rounded-lg transition-all flex items-center gap-1 cursor-pointer shadow-2xs disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 aria-hidden="true" className="w-3 h-3 animate-spin text-[#F47745]" />
+                          <span>Auditing (1.5s)...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles aria-hidden="true" className="w-3 h-3 text-[#F47745]" />
+                          <span>Run Review</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Editor Workspace Box with interactive Textarea */}
@@ -239,23 +279,35 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
                   <span className="text-xs font-bold text-[#123B2F]">
                     Audit &amp; Compliance
                   </span>
-                  {isLoading ? (
-                    <span className="bg-amber-100 text-amber-800 text-[9px] font-semibold px-1.5 py-0.5 rounded animate-pulse">
-                      Analyzing (1.5s)...
-                    </span>
-                  ) : hasRunReview && !isAccepted ? (
-                    <span className="bg-[#FDE8E8] text-[#9B1C1C] text-[9px] font-semibold px-1.5 py-0.5 rounded">
-                      1 Flagged issue
-                    </span>
-                  ) : isAccepted ? (
-                    <span className="bg-[#DEF7EC] text-[#03543F] text-[9px] font-semibold px-1.5 py-0.5 rounded">
-                      0 Flagged issues
-                    </span>
-                  ) : (
-                    <span className="bg-[#EAE5DA] text-[#5A6355] text-[9px] font-semibold px-1.5 py-0.5 rounded">
-                      Ready to Scan
-                    </span>
-                  )}
+                  <div className="flex items-center gap-1.5">
+                    {(hasRunReview || isAccepted) && !isLoading && (
+                      <button
+                        type="button"
+                        onClick={handleReset}
+                        className="text-[9px] font-mono text-[#5A6355] hover:text-[#123B2F] flex items-center gap-0.5 hover:underline cursor-pointer focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
+                      >
+                        <RotateCcw aria-hidden="true" className="w-2.5 h-2.5" />
+                        <span>Reset</span>
+                      </button>
+                    )}
+                    {isLoading ? (
+                      <span className="bg-amber-100 text-amber-800 text-[9px] font-semibold px-1.5 py-0.5 rounded animate-pulse">
+                        Analyzing (1.5s)...
+                      </span>
+                    ) : hasRunReview && !isAccepted ? (
+                      <span className="bg-[#FDE8E8] text-[#9B1C1C] text-[9px] font-semibold px-1.5 py-0.5 rounded">
+                        1 Flagged issue
+                      </span>
+                    ) : isAccepted ? (
+                      <span className="bg-[#DEF7EC] text-[#03543F] text-[9px] font-semibold px-1.5 py-0.5 rounded">
+                        0 Flagged issues
+                      </span>
+                    ) : (
+                      <span className="bg-[#EAE5DA] text-[#5A6355] text-[9px] font-semibold px-1.5 py-0.5 rounded">
+                        Ready to Scan
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* State 1: Simulating AI Thinking (Loading 1.5s) */}
