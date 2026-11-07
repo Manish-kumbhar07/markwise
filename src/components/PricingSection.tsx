@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Check, ShieldCheck, ArrowRight } from 'lucide-react';
 import { calculatePlanPrice, PricingPlan } from '../utils/governance';
+import { ComparisonTable } from './ComparisonTable';
 
 interface PricingSectionProps {
   onOpenGetStarted?: () => void;
@@ -80,152 +81,163 @@ export function PricingSection({ onOpenGetStarted }: PricingSectionProps = {}) {
   const [extraSeats] = useState<number>(0);
 
   return (
-    <section id="pricing" className="py-20 md:py-28 bg-[#FCFAF5] border-t border-[#E8DFD0] relative z-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#174C3B]/10 text-[#174C3B] border border-[#174C3B]/20 mb-3">
-            <span>Enterprise-Grade Transparent Pricing</span>
-          </div>
-          <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#242820] font-inter">
-            Predictable brand protection.
-          </h2>
-          <p className="mt-4 text-base sm:text-lg text-[#545B4E]">
-            One regulatory fine or brand PR crisis costs millions. Markwise provides continuous peace of mind starting at {isAnnual ? '$392' : '$490'}/month.
-          </p>
+    <section id="pricing" className="py-20 md:py-28 bg-[#FCFAF5] dark:bg-[#103429]/40 border-t border-[#E8DFD0] dark:border-[#235A4A] relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-20">
+        {/* 1. Markwise vs. Generic AI Comparison Table */}
+        <ComparisonTable />
 
-          {/* Billing Cycle Toggle */}
-          <div className="mt-8 flex items-center justify-center gap-3">
-            <button
-              type="button"
-              onClick={() => setIsAnnual(false)}
-              className={`text-sm font-semibold transition-colors cursor-pointer ${
-                !isAnnual ? 'text-[#242820] font-bold' : 'text-[#7A8274] hover:text-[#242820]'
-              }`}
-            >
-              Monthly Billing
-            </button>
+        {/* 2. Predictable Transparent Pricing Tier Section */}
+        <div>
+          {/* Header */}
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#174C3B]/10 dark:bg-white/10 text-[#174C3B] dark:text-[#E5EEDC] border border-[#174C3B]/20 dark:border-white/20 mb-3">
+              <span>Enterprise-Grade Transparent Pricing</span>
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#242820] dark:text-[#F7F2E8] font-inter">
+              Predictable brand protection.
+            </h2>
+            <p className="mt-4 text-base sm:text-lg text-[#545B4E] dark:text-[#CBD5C0]">
+              One regulatory fine or brand PR crisis costs millions. Markwise provides continuous peace of mind starting at {isAnnual ? '$392' : '$490'}/month.
+            </p>
 
-            <button
-              type="button"
-              onClick={() => setIsAnnual(!isAnnual)}
-              className="w-14 h-8 rounded-full bg-[#174C3B] p-1 relative transition-colors focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none cursor-pointer"
-              role="switch"
-              aria-checked={isAnnual}
-              aria-label="Toggle Annual or Monthly Billing"
-            >
-              <div
-                className={`w-6 h-6 rounded-full bg-white shadow-xs transition-transform duration-200 ${
-                  isAnnual ? 'translate-x-6' : 'translate-x-0'
-                }`}
-              />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsAnnual(true)}
-              className={`text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer ${
-                isAnnual ? 'text-[#242820] font-bold' : 'text-[#7A8274] hover:text-[#242820]'
-              }`}
-            >
-              <span>Annual Billing</span>
-              <span className="text-xs font-bold text-[#F47745] bg-[#F47745]/10 px-2 py-0.5 rounded-full border border-[#F47745]/20">
-                Save 20%
-              </span>
-            </button>
-          </div>
-        </div>
-
-        {/* Pricing Cards Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-          {PLANS.map((plan) => {
-            const pricing = calculatePlanPrice(plan, isAnnual, extraSeats);
-            const isFeatured = plan.id === 'enterprise';
-
-            return (
-              <div
-                key={plan.id}
-                className={`rounded-2xl border p-7 sm:p-9 flex flex-col justify-between transition-all duration-200 relative ${
-                  isFeatured
-                    ? 'bg-white border-[#174C3B] shadow-lg ring-2 ring-[#174C3B]/10 lg:-translate-y-2'
-                    : 'bg-[#FAF6EF] border-[#E8DFD0] shadow-xs hover:bg-white'
+            {/* Billing Cycle Toggle */}
+            <div className="mt-8 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setIsAnnual(false)}
+                className={`text-sm font-semibold transition-colors cursor-pointer ${
+                  !isAnnual ? 'text-[#242820] dark:text-white font-bold' : 'text-[#7A8274] hover:text-[#242820]'
                 }`}
               >
-                {/* Badge for featured plan */}
-                {plan.badge && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#174C3B] text-white text-[11px] font-bold px-3.5 py-1 rounded-full uppercase tracking-wider shadow-xs">
-                    {plan.badge}
-                  </div>
-                )}
+                Monthly Billing
+              </button>
 
-                <div>
-                  <h3 className="text-xl font-bold text-[#242820] font-inter">
-                    {plan.name}
-                  </h3>
-                  <p className="mt-2 text-xs sm:text-sm text-[#545B4E] leading-relaxed min-h-[40px]">
-                    {plan.description}
-                  </p>
+              <button
+                type="button"
+                onClick={() => setIsAnnual(!isAnnual)}
+                className="w-14 h-8 rounded-full bg-[#174C3B] p-1 relative transition-colors focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none cursor-pointer"
+                role="switch"
+                aria-checked={isAnnual}
+                aria-label="Toggle Annual or Monthly Billing"
+              >
+                <div
+                  className={`w-6 h-6 rounded-full bg-white shadow-xs transition-transform duration-200 ${
+                    isAnnual ? 'translate-x-6' : 'translate-x-0'
+                  }`}
+                />
+              </button>
 
-                  {/* Price display */}
-                  <div className="mt-6 pb-6 border-b border-[#E8DFD0]">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-4xl sm:text-5xl font-bold text-[#242820] tracking-tight font-inter">
-                        ${pricing.baseMonthlyRate}
-                      </span>
-                      <span className="text-xs sm:text-sm text-[#7A8274] font-medium">
-                        / month
-                      </span>
+              <button
+                type="button"
+                onClick={() => setIsAnnual(true)}
+                className={`text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer ${
+                  isAnnual ? 'text-[#242820] dark:text-white font-bold' : 'text-[#7A8274] hover:text-[#242820]'
+                }`}
+              >
+                <span>Annual Billing</span>
+                <span className="text-xs font-bold text-[#F47745] bg-[#F47745]/10 px-2 py-0.5 rounded-full border border-[#F47745]/20">
+                  Save 20%
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Pricing Cards Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+            {PLANS.map((plan) => {
+              const pricing = calculatePlanPrice(plan, isAnnual, extraSeats);
+              const isFeatured = plan.id === 'enterprise';
+
+              return (
+                <div
+                  key={plan.id}
+                  className={`rounded-2xl border p-7 sm:p-9 flex flex-col justify-between transition-all duration-200 relative ${
+                    isFeatured
+                      ? 'bg-white dark:bg-[#164638] border-[#174C3B] shadow-lg ring-2 ring-[#174C3B]/10 lg:-translate-y-2'
+                      : 'bg-[#FAF6EF] dark:bg-white/5 border-[#E8DFD0] dark:border-[#235A4A] shadow-xs hover:bg-white dark:hover:bg-white/10'
+                  }`}
+                >
+                  {/* Badge for featured plan */}
+                  {plan.badge && (
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#174C3B] text-white text-[11px] font-bold px-3.5 py-1 rounded-full uppercase tracking-wider shadow-xs">
+                      {plan.badge}
+                    </div>
+                  )}
+
+                  <div>
+                    <h3 className="text-xl font-bold text-[#242820] dark:text-[#F7F2E8] font-inter">
+                      {plan.name}
+                    </h3>
+                    <p className="mt-2 text-xs sm:text-sm text-[#545B4E] dark:text-[#CBD5C0] leading-relaxed min-h-[40px]">
+                      {plan.description}
+                    </p>
+
+                    {/* Price display */}
+                    <div className="mt-6 pb-6 border-b border-[#E8DFD0] dark:border-[#235A4A]">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-4xl sm:text-5xl font-bold text-[#242820] dark:text-[#F7F2E8] tracking-tight font-inter">
+                          ${pricing.baseMonthlyRate}
+                        </span>
+                        <span className="text-xs sm:text-sm text-[#7A8274] dark:text-[#CBD5C0] font-medium">
+                          / month
+                        </span>
+                      </div>
+
+                      <div className="mt-1 text-xs text-[#7A8274] dark:text-[#CBD5C0]">
+                        {isAnnual ? (
+                          <span>Billed annually (${pricing.baseMonthlyRate * 12}/year)</span>
+                        ) : (
+                          <span>Billed monthly</span>
+                        )}
+                      </div>
                     </div>
 
-                    <div className="mt-1 text-xs text-[#7A8274]">
-                      {isAnnual ? (
-                        <span>Billed annually (${pricing.baseMonthlyRate * 12}/year)</span>
-                      ) : (
-                        <span>Billed monthly</span>
-                      )}
+                    {/* Features list */}
+                    <div className="mt-6 space-y-3">
+                      <span className="text-[11px] font-bold text-[#174C3B] dark:text-[#E5EEDC] uppercase tracking-wider block">
+                        Everything Included:
+                      </span>
+                      <ul className="space-y-2.5">
+                        {plan.features.map((feat) => (
+                          <li
+                            key={feat}
+                            className="flex items-start gap-2.5 text-xs sm:text-sm text-[#242820] dark:text-[#F7F2E8]"
+                          >
+                            <Check className="w-4 h-4 text-[#174C3B] dark:text-emerald-400 shrink-0 mt-0.5" />
+                            <span>{feat}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
 
-                  {/* Features list */}
-                  <div className="mt-6 space-y-3">
-                    <span className="text-[11px] font-bold text-[#174C3B] uppercase tracking-wider block">
-                      Everything Included:
-                    </span>
-                    <ul className="space-y-2.5">
-                      {plan.features.map((feat) => (
-                        <li
-                          key={feat}
-                          className="flex items-start gap-2.5 text-xs sm:text-sm text-[#242820]"
-                        >
-                          <Check className="w-4 h-4 text-[#174C3B] shrink-0 mt-0.5" />
-                          <span>{feat}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  {/* Card CTA */}
+                  <div className="mt-8 pt-6 border-t border-[#E8DFD0] dark:border-[#235A4A]">
+                    <Link
+                      href="/login"
+                      onClick={onOpenGetStarted}
+                      className={`w-full py-3.5 px-4 rounded-xl text-sm font-bold transition-all duration-150 inline-flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] shadow-xs focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none ${
+                        isFeatured
+                          ? 'bg-[#F47745] hover:bg-[#dc612e] text-white shadow-md'
+                          : plan.id === 'custom'
+                          ? 'bg-[#123B2F] hover:bg-[#0c2921] text-white'
+                          : 'border-2 border-[#174C3B] text-[#174C3B] hover:bg-[#174C3B] hover:text-white dark:border-[#E5EEDC] dark:text-[#E5EEDC] dark:hover:bg-[#E5EEDC] dark:hover:text-[#123B2F]'
+                      }`}
+                    >
+                      <span>
+                        {plan.id === 'custom' ? 'Book Enterprise Demo' : 'Start Free Pilot'} &rarr;
+                      </span>
+                    </Link>
+                    <p className="mt-2 text-center text-[11px] text-[#7A8274] dark:text-[#CBD5C0]">
+                      {plan.id === 'custom'
+                        ? 'Custom SLA & private deployment consultation'
+                        : 'No credit card required for pilot setup'}
+                    </p>
                   </div>
                 </div>
-
-                {/* Card CTA */}
-                <div className="mt-8 pt-6 border-t border-[#E8DFD0]">
-                  <Link
-                    href="/login"
-                    onClick={onOpenGetStarted}
-                    className={`w-full py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-150 inline-flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none ${
-                      isFeatured
-                        ? 'bg-[#F47745] hover:bg-[#dc612e] text-white shadow-xs'
-                        : 'border-2 border-[#174C3B] text-[#174C3B] hover:bg-[#174C3B] hover:text-white dark:border-[#E5EEDC] dark:text-[#E5EEDC] dark:hover:bg-[#E5EEDC] dark:hover:text-[#123B2F]'
-                    }`}
-                  >
-                    <span>Start Free Pilot</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                  <p className="mt-2 text-center text-[11px] text-[#7A8274]">
-                    No credit card required for pilot setup
-                  </p>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
         {/* Security & Regulatory Compliance Banner */}
