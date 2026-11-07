@@ -98,6 +98,14 @@ Create ➔ Check ➔ Explain ➔ Fix ➔ Verify ➔ Approve ➔ Publish ➔ Moni
 | **Data Visualization** | Recharts (Responsive bar and donut telemetry charts) |
 | **Deployment** | Vercel (Edge network & automated CI/CD pipeline) |
 
+```mermaid
+graph TD
+  Client[Next.js Frontend] -->|Server Action| API[Next.js API Routes]
+  API -->|Prisma Client| DB[(Supabase PostgreSQL)]
+  API -->|API Key| Gemini[Google Gemini AI]
+  DB -->|Row-Level Security| API
+```
+
 ---
 
 ## Getting Started (Local Setup)
@@ -123,6 +131,9 @@ Create a `.env.local` file in the project root:
 
 ```env
 # PostgreSQL Connection Strings (Supabase)
+# NOTE: BOTH DATABASE_URL and DIRECT_URL are required for Prisma connection pooling:
+# - DATABASE_URL connects to the transaction pooler (port 6543) for serverless client queries
+# - DIRECT_URL connects directly to PostgreSQL (port 5432) for migrations and schema synchronization
 DATABASE_URL="postgresql://postgres.[YOUR_PROJECT_ID]:[YOUR_PASSWORD]@aws-0-us-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
 DIRECT_URL="postgresql://postgres.[YOUR_PROJECT_ID]:[YOUR_PASSWORD]@aws-0-us-west-1.pooler.supabase.com:5432/postgres"
 
@@ -133,6 +144,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 # Google Gemini API Key
 GEMINI_API_KEY="AIzaSy..."
 ```
+
+> **Important:** Both `DATABASE_URL` and `DIRECT_URL` are strictly required for Prisma connection pooling. `DATABASE_URL` connects through Supabase's transaction pooler (PgBouncer/Supavisor on port `6543` with `?pgbouncer=true`) for resilient serverless client operations, while `DIRECT_URL` connects directly to the underlying PostgreSQL instance (port `5432`) to execute schema pushes (`prisma db push`) and migrations.
 
 ### 4. Database Setup (Prisma)
 Generate the Prisma Client and synchronize schema tables with your PostgreSQL database:
