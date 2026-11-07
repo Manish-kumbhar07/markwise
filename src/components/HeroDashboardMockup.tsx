@@ -76,11 +76,11 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
           </div>
         </div>
 
-        {/* 3-Column Dashboard Body (Responsive scroll wrapper for mobile) */}
-        <div className="overflow-x-auto min-w-0">
-          <div className="grid grid-cols-12 min-w-[580px] lg:min-w-0 min-h-[380px] text-xs">
-            {/* Column 1: Left Mini Sidebar (Dark Forest Green) */}
-            <div className="col-span-3 bg-[#123B2F] text-white p-3 flex flex-col justify-between border-r border-[#103429] select-none">
+        {/* 3-Column Dashboard Body (Responsive on mobile: Column 1 & 2 hide below md) */}
+        <div className="overflow-x-auto min-w-0 w-full">
+          <div className="grid grid-cols-12 w-full md:min-w-[580px] lg:min-w-0 min-h-[380px] text-xs">
+            {/* Column 1: Left Mini Sidebar (Dark Forest Green - hidden on mobile) */}
+            <div className="hidden md:flex md:col-span-3 bg-[#123B2F] text-white p-3 flex-col justify-between border-r border-[#103429] select-none">
               <div>
                 {/* Brand Header */}
                 <div className="flex items-center gap-1.5 pb-3 border-b border-white/10">
@@ -132,8 +132,8 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
               </div>
             </div>
 
-            {/* Column 2: Center Editor Pane */}
-            <div className="col-span-5 bg-[#FAF7F2] p-3 flex flex-col justify-between border-r border-[#E8DFD0]">
+            {/* Column 2: Center Editor Pane (Hidden on screens < md to prioritize Issue Card readability) */}
+            <div className="hidden md:flex md:col-span-5 bg-[#FAF7F2] p-3 flex-col justify-between border-r border-[#E8DFD0]">
               <div>
                 {/* Draft Header & Run Review Button */}
                 <div className="flex items-center justify-between pb-2 border-b border-[#E8DFD0]">
@@ -144,7 +144,7 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
                     type="button"
                     onClick={handleRunReview}
                     disabled={isLoading}
-                    className="px-2.5 py-1 text-[10px] font-semibold text-white bg-[#123B2F] hover:bg-[#0c2921] active:scale-95 rounded-lg transition-all flex items-center gap-1 cursor-pointer shadow-2xs disabled:opacity-60"
+                    className="px-2.5 py-1 text-[10px] font-semibold text-white bg-[#123B2F] hover:bg-[#0c2921] active:scale-95 rounded-lg transition-all flex items-center gap-1 cursor-pointer shadow-2xs disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
                   >
                     {isLoading ? (
                       <>
@@ -212,9 +212,24 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
               </div>
             </div>
 
-            {/* Column 3: Right Audit & Compliance Panel */}
-            <div className="col-span-4 bg-[#FAF8F5] p-3 flex flex-col justify-between space-y-2">
+            {/* Column 3: Right Audit & Compliance Panel (Full width col-span-12 on mobile, col-span-4 on md+) */}
+            <div className="col-span-12 md:col-span-4 bg-[#FAF8F5] p-3 flex flex-col justify-between space-y-2">
               <div>
+                {/* Mobile-only Draft Copy Context Banner */}
+                <div className="md:hidden mb-2.5 p-2 rounded-lg bg-white border border-[#E8DFD0] text-[11px] space-y-1 shadow-2xs">
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="font-mono font-bold uppercase text-[#4B5563]">
+                      Draft Claim Under Audit:
+                    </span>
+                    <span className="text-[9px] font-mono text-[#123B2F] font-semibold bg-[#123B2F]/10 px-1.5 py-0.5 rounded">
+                      Demo Copy
+                    </span>
+                  </div>
+                  <p className="font-medium text-[#123B2F] italic text-xs leading-snug">
+                    &ldquo;{inputText}&rdquo;
+                  </p>
+                </div>
+
                 {/* Panel Header */}
                 <div className="flex items-center justify-between pb-2 border-b border-[#E8DFD0]">
                   <span className="text-xs font-bold text-[#123B2F]">
@@ -267,7 +282,7 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
                     <button
                       type="button"
                       onClick={handleRunReview}
-                      className="px-2.5 py-1 text-[9px] font-semibold text-white bg-[#123B2F] hover:bg-[#1A4C3E] rounded-md transition-all shadow-2xs cursor-pointer flex items-center gap-1 active:scale-95"
+                      className="px-2.5 py-1 text-[9px] font-semibold text-white bg-[#123B2F] hover:bg-[#1A4C3E] rounded-md transition-all shadow-2xs cursor-pointer flex items-center gap-1 active:scale-95 focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
                     >
                       <Sparkles className="w-2.5 h-2.5 text-[#F47745]" />
                       <span>Run Review</span>
@@ -283,7 +298,7 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
                       <span className="bg-[#C53030] text-white text-[9px] font-bold px-1.5 py-0.2 rounded uppercase tracking-wider">
                         HIGH
                       </span>
-                      <span className="text-[9px] text-[#7A8274] flex items-center gap-0.5">
+                      <span className="text-[9px] text-[#4B5563] flex items-center gap-0.5 font-medium">
                         <span>Score impact</span>
                         <AlertTriangle className="w-2.5 h-2.5 text-[#C53030]" />
                       </span>
@@ -294,19 +309,19 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
                       Unsupported performance claim
                     </h4>
 
-                    {/* WHY Details */}
+                    {/* WHY Details with WCAG AA compliant #4B5563 contrast */}
                     <div className="text-[10px] space-y-0.5">
-                      <div className="text-[8px] font-mono font-bold text-[#8C9485] uppercase">
+                      <div className="text-[8px] font-mono font-bold text-[#4B5563] uppercase tracking-wider">
                         WHY
                       </div>
-                      <p className="text-[#4A5245] leading-snug">
+                      <p className="text-[#242820] leading-snug">
                         Superlative claim with no linked evidence
                       </p>
                     </div>
 
-                    {/* RULE Row */}
+                    {/* RULE Row with WCAG AA compliant #4B5563 contrast */}
                     <div className="flex items-center gap-1 text-[10px]">
-                      <span className="text-[8px] font-mono font-bold text-[#8C9485]">
+                      <span className="text-[8px] font-mono font-bold text-[#4B5563] uppercase tracking-wider">
                         RULE
                       </span>
                       <span className="font-mono text-[9px] font-semibold text-[#123B2F] bg-[#EAE5DA] px-1.5 py-0.2 rounded">
@@ -316,7 +331,7 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
 
                     {/* SUGGESTED FIX Box */}
                     <div className="p-2 rounded-lg bg-[#E5EEDC] border border-[#C5D6BB] space-y-0.5">
-                      <div className="text-[8px] font-mono font-bold text-[#1F3D2A] uppercase">
+                      <div className="text-[8px] font-mono font-bold text-[#1F3D2A] uppercase tracking-wider">
                         SUGGESTED FIX
                       </div>
                       <p className="text-[10px] text-[#1F3D2A] leading-snug font-medium italic">
@@ -335,7 +350,7 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
                         <button
                           type="button"
                           onClick={handleApplyFix}
-                          className="px-2.5 py-1 text-[9px] font-semibold text-white bg-[#123B2F] hover:bg-[#1A4C3E] rounded transition-colors shadow-2xs cursor-pointer flex items-center gap-1 active:scale-95"
+                          className="px-2.5 py-1 text-[9px] font-semibold text-white bg-[#123B2F] hover:bg-[#1A4C3E] rounded transition-colors shadow-2xs cursor-pointer flex items-center gap-1 active:scale-95 focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
                         >
                           <span>Apply Fix</span>
                           <Check className="w-2.5 h-2.5" />
@@ -360,7 +375,7 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
                     <button
                       type="button"
                       onClick={handleReset}
-                      className="text-[9px] font-mono text-[#123B2F] underline hover:text-[#C85A32] cursor-pointer pt-1 flex items-center justify-center gap-1 mx-auto"
+                      className="text-[9px] font-mono text-[#123B2F] underline hover:text-[#C85A32] cursor-pointer pt-1 flex items-center justify-center gap-1 mx-auto focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none rounded"
                     >
                       <RotateCcw className="w-2.5 h-2.5" />
                       <span>Reset demo</span>

@@ -109,7 +109,7 @@ export function PricingSection({ onOpenGetStarted }: PricingSectionProps = {}) {
             <button
               type="button"
               onClick={() => setIsAnnual(!isAnnual)}
-              className="w-14 h-8 rounded-full bg-[#174C3B] p-1 relative transition-colors focus-visible:outline-2 focus-visible:outline-[#174C3B] cursor-pointer"
+              className="w-14 h-8 rounded-full bg-[#174C3B] p-1 relative transition-colors focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none cursor-pointer"
               role="switch"
               aria-checked={isAnnual}
               aria-label="Toggle Annual or Monthly Billing"
@@ -210,7 +210,7 @@ export function PricingSection({ onOpenGetStarted }: PricingSectionProps = {}) {
                   <Link
                     href="/login"
                     onClick={onOpenGetStarted}
-                    className={`w-full py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-150 inline-flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] ${
+                    className={`w-full py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-150 inline-flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none ${
                       isFeatured
                         ? 'bg-[#F47745] hover:bg-[#dc612e] text-white shadow-xs'
                         : 'border-2 border-[#174C3B] text-[#174C3B] hover:bg-[#174C3B] hover:text-white dark:border-[#E5EEDC] dark:text-[#E5EEDC] dark:hover:bg-[#E5EEDC] dark:hover:text-[#123B2F]'
@@ -246,7 +246,7 @@ export function PricingSection({ onOpenGetStarted }: PricingSectionProps = {}) {
           <button
             type="button"
             onClick={onOpenGetStarted}
-            className="px-5 py-2.5 text-xs sm:text-sm font-semibold text-[#174C3B] border border-[#174C3B]/30 hover:bg-[#FAF6EF] rounded-xl transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            className="px-5 py-2.5 text-xs sm:text-sm font-semibold text-[#174C3B] border border-[#174C3B]/30 hover:bg-[#FAF6EF] rounded-xl transition-colors whitespace-nowrap shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
           >
             Request Security Whitepaper
           </button>

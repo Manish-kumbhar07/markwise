@@ -15,6 +15,7 @@ export interface ReviewIssueResult {
   suggestedFix: string;
   status: string;
   aiAssisted: boolean;
+  evidenceSource?: string;
 }
 
 export interface ReviewContentResult {

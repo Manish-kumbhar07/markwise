@@ -119,7 +119,7 @@ export function Navbar({}: NavbarProps = {}) {
             <button
               type="button"
               onClick={toggleTheme}
-              className="w-11 h-11 rounded-full border border-[#D5CDBD] dark:border-[#235A4A] flex items-center justify-center text-[#545B4E] dark:text-[#CBD5C0] hover:text-[#123B2F] dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/10 transition-colors cursor-pointer shadow-2xs"
+              className="w-11 h-11 rounded-full border border-[#D5CDBD] dark:border-[#235A4A] flex items-center justify-center text-[#545B4E] dark:text-[#CBD5C0] hover:text-[#123B2F] dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/10 transition-colors cursor-pointer shadow-2xs focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
               aria-label="Toggle theme"
             >
               {mounted && resolvedTheme === 'dark' ? (
@@ -132,7 +132,7 @@ export function Navbar({}: NavbarProps = {}) {
             {/* Login button (at least 44px touch height) */}
             <Link
               href="/login"
-              className="min-h-[44px] px-5 py-2.5 text-xs sm:text-sm font-medium text-[#123B2F] dark:text-[#F7F2E8] border border-[#D5CDBD] dark:border-[#235A4A] bg-white/50 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 rounded-full transition-all shadow-2xs cursor-pointer active:scale-98 flex items-center justify-center"
+              className="min-h-[44px] px-5 py-2.5 text-xs sm:text-sm font-medium text-[#123B2F] dark:text-[#F7F2E8] border border-[#D5CDBD] dark:border-[#235A4A] bg-white/50 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 rounded-full transition-all shadow-2xs cursor-pointer active:scale-98 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
             >
               Login
             </Link>
@@ -140,7 +140,7 @@ export function Navbar({}: NavbarProps = {}) {
             {/* Book Demo → button (at least 44px touch height) */}
             <Link
               href="/login"
-              className="min-h-[44px] px-5 sm:px-6 py-2.5 text-xs sm:text-sm font-medium text-white bg-[#123B2F] dark:bg-[#F47745] hover:bg-[#1A4C3E] dark:hover:bg-[#dc612e] rounded-full transition-all shadow-xs hover:shadow-sm cursor-pointer inline-flex items-center gap-2 active:scale-98"
+              className="min-h-[44px] px-5 sm:px-6 py-2.5 text-xs sm:text-sm font-medium text-white bg-[#123B2F] dark:bg-[#F47745] hover:bg-[#1A4C3E] dark:hover:bg-[#dc612e] rounded-full transition-all shadow-xs hover:shadow-sm cursor-pointer inline-flex items-center gap-2 active:scale-98 focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
             >
               <span>Book Demo</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -152,7 +152,7 @@ export function Navbar({}: NavbarProps = {}) {
             <button
               type="button"
               onClick={toggleTheme}
-              className="w-11 h-11 rounded-full border border-[#D5CDBD] dark:border-[#235A4A] flex items-center justify-center text-[#545B4E] dark:text-[#CBD5C0] bg-white/60 dark:bg-white/10"
+              className="w-11 h-11 rounded-full border border-[#D5CDBD] dark:border-[#235A4A] flex items-center justify-center text-[#545B4E] dark:text-[#CBD5C0] bg-white/60 dark:bg-white/10 focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
               aria-label="Toggle theme"
             >
               {mounted && resolvedTheme === 'dark' ? (
@@ -163,14 +163,14 @@ export function Navbar({}: NavbarProps = {}) {
             </button>
             <Link
               href="/login"
-              className="min-h-[44px] px-3.5 py-2 text-xs font-semibold text-[#123B2F] dark:text-[#F7F2E8] border border-[#D5CDBD] dark:border-[#235A4A] rounded-full bg-white/60 dark:bg-white/10 flex items-center justify-center"
+              className="min-h-[44px] px-3.5 py-2 text-xs font-semibold text-[#123B2F] dark:text-[#F7F2E8] border border-[#D5CDBD] dark:border-[#235A4A] rounded-full bg-white/60 dark:bg-white/10 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
             >
               Login
             </Link>
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="w-11 h-11 text-[#123B2F] dark:text-[#F7F2E8] hover:text-[#C85A32] rounded-full border border-[#D5CDBD] dark:border-[#235A4A] bg-white/60 dark:bg-white/10 flex items-center justify-center cursor-pointer"
+              className="w-11 h-11 text-[#123B2F] dark:text-[#F7F2E8] hover:text-[#C85A32] rounded-full border border-[#D5CDBD] dark:border-[#235A4A] bg-white/60 dark:bg-white/10 flex items-center justify-center cursor-pointer focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
               aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
               {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}

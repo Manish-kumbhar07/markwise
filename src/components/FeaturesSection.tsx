@@ -232,10 +232,10 @@ export function FeaturesSection() {
                   key={feat.id}
                   type="button"
                   onClick={() => setActiveTab(feat.id)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none ${
                     activeTab === feat.id
                       ? 'bg-[#123B2F] text-white dark:bg-white dark:text-[#123B2F] shadow-xs'
-                      : 'text-[#7A8274] hover:text-[#123B2F] dark:hover:text-white'
+                      : 'text-[#545B4E] dark:text-[#CBD5C0] hover:text-[#123B2F] dark:hover:text-white'
                   }`}
                 >
                   {feat.tag.split('.')[0]}. {feat.tabTitle}
@@ -258,7 +258,7 @@ export function FeaturesSection() {
                       key={feat.id}
                       type="button"
                       onClick={() => setActiveTab(feat.id)}
-                      className={`w-full text-left p-4 sm:p-5 rounded-2xl border transition-all duration-200 cursor-pointer ${
+                      className={`w-full text-left p-4 sm:p-5 rounded-2xl border transition-all duration-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none ${
                         isActive
                           ? 'bg-white dark:bg-[#164638] border-[#174C3B] dark:border-[#CBD5C0] shadow-md ring-2 ring-[#174C3B]/10 -translate-y-0.5'
                           : 'bg-[#FAF6EF]/60 dark:bg-white/5 border-[#E8DFD0] dark:border-[#235A4A] hover:bg-white hover:border-[#D5CDBD]'
@@ -379,7 +379,7 @@ export function FeaturesSection() {
                         </div>
 
                         <div className="flex items-center gap-1.5 bg-[#FAF6EF] dark:bg-white/10 px-2 py-0.5 rounded border border-[#E8DFD0] dark:border-[#235A4A]">
-                          <span className="text-[9px] font-mono uppercase text-[#7A8274] dark:text-[#CBD5C0] font-bold">
+                          <span className="text-[9px] font-mono uppercase text-[#4B5563] dark:text-gray-300 font-bold">
                             RULE ID:
                           </span>
                           <span className="font-mono text-[10px] font-bold text-[#123B2F] dark:text-emerald-400">
@@ -395,18 +395,18 @@ export function FeaturesSection() {
 
                       {/* WHY: Causal Reasoning Breakdown */}
                       <div className="p-3 rounded-xl bg-[#FAF8F5] dark:bg-white/5 border border-[#E8DFD0] dark:border-[#235A4A] space-y-1">
-                        <div className="text-[10px] font-mono font-bold text-[#8C9485] uppercase tracking-wider flex items-center gap-1">
+                        <div className="text-[10px] font-mono font-bold text-[#4B5563] dark:text-gray-300 uppercase tracking-wider flex items-center gap-1">
                           <Scale className="w-3 h-3 text-[#F47745]" />
                           <span>WHY IT WAS FLAGGED</span>
                         </div>
-                        <p className="text-xs text-[#4A5245] dark:text-[#CBD5C0] leading-snug">
+                        <p className="text-xs text-[#242820] dark:text-[#CBD5C0] leading-snug">
                           The phrase <em>&ldquo;guarantees the fastest&rdquo;</em> constitutes an absolute superlative claim with no linked evidence in the Fact Vault or accredited third-party benchmark study.
                         </p>
                       </div>
 
                       {/* STATUTORY & POLICY CITATION */}
-                      <div className="flex items-center gap-2 text-[11px] text-[#545B4E] dark:text-[#CBD5C0]">
-                        <span className="text-[9px] font-mono font-bold uppercase text-[#8C9485]">
+                      <div className="flex items-center gap-2 text-[11px] text-[#242820] dark:text-[#CBD5C0]">
+                        <span className="text-[9px] font-mono font-bold uppercase text-[#4B5563] dark:text-gray-300">
                           LEGAL CITATION:
                         </span>
                         <span className="font-mono text-[10px] bg-[#EAE5DA] dark:bg-white/10 px-2 py-0.5 rounded font-medium text-[#123B2F] dark:text-[#E5EEDC]">
@@ -438,7 +438,7 @@ export function FeaturesSection() {
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
-                            className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#123B2F] hover:bg-[#1A4C3E] dark:bg-[#F47745] dark:hover:bg-[#dc612e] transition-colors flex items-center gap-1 shadow-2xs cursor-pointer"
+                            className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#123B2F] hover:bg-[#1A4C3E] dark:bg-[#F47745] dark:hover:bg-[#dc612e] transition-colors flex items-center gap-1 shadow-2xs cursor-pointer focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
                           >
                             <span>Apply Fix</span>
                             <Check className="w-3.5 h-3.5" />

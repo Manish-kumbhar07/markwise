@@ -138,27 +138,39 @@ export function IssueCard({
         <div className="space-y-1.5 text-xs">
           {/* WHY */}
           <div className="bg-[#F7F2E8]/80 rounded-lg p-2.5 border border-[#E8DFD0]/70">
-            <span className="font-mono text-[9px] uppercase tracking-wider font-bold text-[#7A8274] block mb-0.5">
+            <span className="font-mono text-[10px] uppercase tracking-wider font-bold text-[#4B5563] block mb-0.5">
               WHY:
             </span>
-            <p className="text-[#3A3F35] text-xs leading-snug">{issue.why}</p>
+            <p className="text-[#242820] text-xs leading-snug">{issue.why}</p>
           </div>
 
           {/* RULE RECORD */}
           <div className="flex items-center justify-between text-xs px-0.5 pt-0.5">
-            <span className="font-mono text-[10px] uppercase tracking-wider font-bold text-[#7A8274]">
-              RULE RECORD:
+            <span className="font-mono text-[10px] uppercase tracking-wider font-bold text-[#4B5563]">
+              RULE:
             </span>
             <span className="font-mono text-[11px] font-bold text-[#123B2F]">
               {issue.ruleId ? issue.ruleId.slice(0, 16) : 'Brand Safety Codex'}
             </span>
           </div>
+
+          {/* EVIDENCE RECORD (if available) */}
+          {issue.evidenceSource && (
+            <div className="flex items-center justify-between text-xs px-0.5 pt-0.5">
+              <span className="font-mono text-[10px] uppercase tracking-wider font-bold text-[#4B5563]">
+                EVIDENCE:
+              </span>
+              <span className="font-mono text-[11px] font-medium text-[#123B2F] truncate max-w-[200px]">
+                {issue.evidenceSource}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* SUGGESTED FIX BOX */}
         {issue.suggestedFix && (
           <div className="bg-[#E5EEDC] rounded-lg p-2.5 border border-[#d0dfc4] space-y-1 shadow-2xs">
-            <span className="font-mono text-[9px] uppercase tracking-wider font-bold text-[#123B2F] flex items-center gap-1">
+            <span className="font-mono text-[10px] uppercase tracking-wider font-bold text-[#1F3D2A] flex items-center gap-1">
               <Sparkles className="w-3 h-3 text-[#123B2F]" />
               Suggested Compliant Fix
             </span>
@@ -176,7 +188,7 @@ export function IssueCard({
               type="button"
               onClick={() => onAccept(issue)}
               disabled={isAccepted || isPending}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer shadow-2xs flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer shadow-2xs flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none ${
                 isAccepted
                   ? 'bg-emerald-700 text-white cursor-default'
                   : 'bg-[#123B2F] hover:bg-[#0c2921] active:scale-[0.97] text-white disabled:opacity-70'
@@ -191,7 +203,7 @@ export function IssueCard({
               type="button"
               onClick={() => onEdit(issue)}
               disabled={isAccepted || isPending}
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold text-[#545B4E] hover:text-[#123B2F] hover:bg-[#123B2F]/10 transition-colors cursor-pointer disabled:opacity-50"
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold text-[#545B4E] hover:text-[#123B2F] hover:bg-[#123B2F]/10 transition-colors cursor-pointer disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
             >
               Edit
             </button>
@@ -201,7 +213,7 @@ export function IssueCard({
               type="button"
               onClick={() => onOverride(issue)}
               disabled={isOverridden || isAccepted || isPending}
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold border border-[#E8DFD0] hover:border-[#123B2F] text-[#545B4E] hover:text-[#123B2F] bg-transparent transition-colors cursor-pointer disabled:opacity-50"
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold border border-[#E8DFD0] hover:border-[#123B2F] text-[#545B4E] hover:text-[#123B2F] bg-transparent transition-colors cursor-pointer disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
             >
               Override
             </button>
@@ -211,7 +223,7 @@ export function IssueCard({
               type="button"
               onClick={handleOpenRuleDialog}
               disabled={isRuleCreated || isPending}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all duration-150 cursor-pointer shadow-2xs flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all duration-150 cursor-pointer shadow-2xs flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none ${
                 isRuleCreated
                   ? 'bg-[#123B2F]/10 border-[#123B2F]/30 text-[#123B2F] cursor-default'
                   : 'bg-[#FAF6EF] hover:bg-[#FAF6EF]/90 border-[#123B2F]/30 text-[#123B2F] hover:border-[#123B2F]'
@@ -315,14 +327,14 @@ export function IssueCard({
                 type="button"
                 onClick={() => setIsDialogOpen(false)}
                 disabled={isSavingRule}
-                className="px-4 py-2 text-xs font-semibold text-[#545B4E] hover:bg-[#F7F2E8] rounded-xl transition-colors cursor-pointer"
+                className="px-4 py-2 text-xs font-semibold text-[#545B4E] hover:bg-[#F7F2E8] rounded-xl transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSavingRule}
-                className="px-4 py-2 text-xs font-semibold text-white bg-[#123B2F] hover:bg-[#0c2921] rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-75"
+                className="px-4 py-2 text-xs font-semibold text-white bg-[#123B2F] hover:bg-[#0c2921] rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-75 focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
               >
                 {isSavingRule ? (
                   <>
