@@ -84,21 +84,37 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Security & Compliance */}
+          {/* Trust & Architecture */}
           <div className="space-y-2.5">
             <span className="block font-bold uppercase tracking-wider text-brand-forest dark:text-brand-ivory text-[11px] font-mono">
-              Compliance
+              Trust
             </span>
             <ul className="space-y-2 text-[11px] text-brand-subtle dark:text-zinc-400">
               <li>
                 <Link href="/trust" className="font-semibold text-brand-forest dark:text-emerald-300 hover:text-brand-coral transition-colors block">
-                  Markwise Trust Center &rarr;
+                  Trust Center &rarr;
                 </Link>
               </li>
-              <li>Designed for SOC 2 Compliance</li>
-              <li>ISO 27001 Security Management</li>
-              <li>Zero Data Retention (ZDR)</li>
-              <li>Target 99.9% Availability (Pilot Phase)</li>
+              <li>
+                <Link href="/trust#data-privacy" className="hover:text-brand-coral transition-colors block">
+                  Workspace Isolation (Supabase)
+                </Link>
+              </li>
+              <li>
+                <Link href="/trust#zero-training" className="hover:text-brand-coral transition-colors block">
+                  Zero LLM Training Guarantee
+                </Link>
+              </li>
+              <li>
+                <Link href="/trust#responsible-ai" className="hover:text-brand-coral transition-colors block">
+                  Responsible AI &amp; Human Approval
+                </Link>
+              </li>
+              <li>
+                <Link href="/trust#audit-trails" className="hover:text-brand-coral transition-colors block">
+                  SHA-256 Audit Trails
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

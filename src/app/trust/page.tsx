@@ -12,19 +12,20 @@ import {
   ArrowRight,
   CheckCircle2,
   FileCheck2,
-  Calendar,
   Check,
   ChevronRight,
   ShieldCheck,
-  Download,
+  Database,
+  UserCheck,
+  Hash,
 } from 'lucide-react';
 
 const SECTIONS = [
-  { id: 'data-privacy', title: 'Data Privacy & Isolation', icon: Lock },
+  { id: 'data-privacy', title: 'Data Privacy & Supabase Isolation', icon: Database },
   { id: 'zero-training', title: 'Zero LLM Training Guarantee', icon: EyeOff },
-  { id: 'responsible-ai', title: 'Responsible AI & Explainability', icon: Sparkles },
+  { id: 'responsible-ai', title: 'Responsible AI & Human Approval', icon: UserCheck },
+  { id: 'audit-trails', title: 'SHA-256 Audit Trails & Seals', icon: Hash },
   { id: 'soc2-roadmap', title: 'SOC 2 Compliance Roadmap', icon: ShieldCheck },
-  { id: 'security-faq', title: 'Architecture FAQ & Covenants', icon: FileCheck2 },
 ];
 
 export default function TrustCenterPage() {
@@ -32,7 +33,7 @@ export default function TrustCenterPage() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPos = window.scrollY + 140;
+      const scrollPos = window.scrollY + 160;
       for (const section of SECTIONS) {
         const element = document.getElementById(section.id);
         if (element) {
@@ -92,21 +93,21 @@ export default function TrustCenterPage() {
         </div>
       </header>
 
-      {/* Main Document Layout: Sidebar + Document Content */}
+      {/* Main Document Layout: Left Sidebar + Document Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-          {/* Left Column: Sticky Document Navigation Sidebar */}
+          {/* Left Column: Document Navigation Sidebar */}
           <aside className="lg:col-span-4 lg:sticky lg:top-24 space-y-6">
             <div className="bg-white dark:bg-brand-forest-dark/70 rounded-2xl border border-brand-border dark:border-[#235A4A] p-5 shadow-xs space-y-4">
               <div className="space-y-1">
                 <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-brand-coral block">
-                  Security Specification
+                  Security Architecture
                 </span>
                 <h2 className="text-base font-bold text-brand-ink dark:text-brand-ivory font-serif">
                   Document Navigation
                 </h2>
                 <p className="text-xs text-brand-muted dark:text-zinc-400">
-                  Architectural principles, legal covenants, and certification roadmap.
+                  Architectural guarantees, data privacy standards, and responsible AI safeguards.
                 </p>
               </div>
 
@@ -131,13 +132,13 @@ export default function TrustCenterPage() {
                 })}
               </nav>
 
-              <div className="p-3 rounded-xl bg-brand-cream dark:bg-white/5 border border-brand-border dark:border-[#235A4A] space-y-2 text-xs">
+              <div className="p-3.5 rounded-xl bg-brand-cream dark:bg-white/5 border border-brand-border dark:border-[#235A4A] space-y-2 text-xs">
                 <div className="flex items-center gap-1.5 text-brand-forest dark:text-emerald-300 font-bold text-[11px]">
                   <ShieldCheck aria-hidden="true" className="w-4 h-4 text-emerald-600" />
-                  <span>Enterprise Assurance</span>
+                  <span>Enterprise Security Assurance</span>
                 </div>
                 <p className="text-[11px] text-brand-muted dark:text-zinc-400 leading-relaxed">
-                  Need a custom Data Processing Agreement (DPA) or Business Associate Agreement (BAA)?
+                  Need custom Data Processing Agreements (DPA), Business Associate Agreements (BAA), or private VPC isolation?
                 </p>
                 <Link
                   href="/login"
@@ -162,61 +163,61 @@ export default function TrustCenterPage() {
                 Trust Center
               </h1>
               <p className="text-base sm:text-lg text-brand-muted dark:text-zinc-300 leading-relaxed">
-                Enterprise content governance demands absolute transparency. Here are the architectural guarantees, data isolation covenants, and responsible AI safeguards that protect your brand.
+                Enterprise content governance demands absolute transparency. Here are the architectural guarantees, database isolation models, and responsible AI safeguards that protect your brand.
               </p>
               <div className="flex flex-wrap items-center gap-4 text-xs text-brand-subtle dark:text-zinc-400 pt-2 font-mono">
-                <span>Version: 2026.4</span>
+                <span>Specification: 2026.4</span>
                 <span aria-hidden="true">·</span>
                 <span>Audience: Legal, Compliance, Infosec</span>
                 <span aria-hidden="true">·</span>
-                <span className="text-emerald-700 dark:text-emerald-400 font-semibold">Live Audit Architecture</span>
+                <span className="text-emerald-700 dark:text-emerald-400 font-semibold">Production Verified</span>
               </div>
             </div>
 
-            {/* Section 1: Data Privacy & Isolation */}
+            {/* Section 1: Data Privacy & Supabase Isolation */}
             <section id="data-privacy" className="scroll-mt-24 space-y-6">
               <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-brand-forest dark:text-emerald-300">
-                <Lock aria-hidden="true" className="w-4 h-4 text-brand-coral" />
-                <span>01. Data Governance Architecture</span>
+                <Database aria-hidden="true" className="w-4 h-4 text-brand-coral" />
+                <span>01. Multi-Tenant Architecture</span>
               </div>
               <h2 className="text-2xl font-bold font-serif text-brand-ink dark:text-brand-ivory">
-                Data Privacy &amp; Isolation
+                Data Privacy &amp; Workspace Isolation via Supabase
               </h2>
               <p className="text-sm text-brand-muted dark:text-zinc-300 leading-relaxed">
-                Enterprise draft copy is inspected exclusively in volatile, ephemeral worker memory and discarded immediately following analysis. Markwise does not store raw customer copy unless explicitly committed to a workspace draft record by an authenticated user.
+                Every organization operating on Markwise is partitioned into an isolated tenant container powered by <strong>Supabase and PostgreSQL Row-Level Security (RLS)</strong>. Under no circumstances can data from Workspace A bleed into, or be queried by, Workspace B.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-white dark:bg-brand-forest-dark/50 p-4 rounded-xl border border-brand-border dark:border-[#235A4A] space-y-2">
+                <div className="bg-white dark:bg-brand-forest-dark/50 p-4.5 rounded-xl border border-brand-border dark:border-[#235A4A] space-y-2">
                   <span className="font-bold text-xs text-brand-forest dark:text-brand-ivory block">
-                    Volatile Memory Inspection
+                    PostgreSQL Row-Level Security (RLS)
                   </span>
-                  <p className="text-xs text-brand-muted dark:text-zinc-400">
-                    Draft text analyzed in real-time is never cached to secondary storage or shared across service threads.
+                  <p className="text-xs text-brand-muted dark:text-zinc-400 leading-relaxed">
+                    Policies are enforced directly at the SQL database engine tier using authenticated JWT claims (`auth.uid()` and `workspace_id`). No API vulnerability or query bug can bypass RLS boundaries.
                   </p>
                 </div>
-                <div className="bg-white dark:bg-brand-forest-dark/50 p-4 rounded-xl border border-brand-border dark:border-[#235A4A] space-y-2">
+                <div className="bg-white dark:bg-brand-forest-dark/50 p-4.5 rounded-xl border border-brand-border dark:border-[#235A4A] space-y-2">
                   <span className="font-bold text-xs text-brand-forest dark:text-brand-ivory block">
-                    PostgreSQL Row-Level Security
+                    Ephemeral Volatile Memory Scans
                   </span>
-                  <p className="text-xs text-brand-muted dark:text-zinc-400">
-                    Every database query enforces workspace isolation at the engine level, guaranteeing zero cross-tenant leakage.
+                  <p className="text-xs text-brand-muted dark:text-zinc-400 leading-relaxed">
+                    Interactive draft content is analyzed exclusively in volatile worker memory and discarded immediately following rule evaluation. Markwise never caches raw draft copy to secondary disk.
                   </p>
                 </div>
-                <div className="bg-white dark:bg-brand-forest-dark/50 p-4 rounded-xl border border-brand-border dark:border-[#235A4A] space-y-2">
+                <div className="bg-white dark:bg-brand-forest-dark/50 p-4.5 rounded-xl border border-brand-border dark:border-[#235A4A] space-y-2">
                   <span className="font-bold text-xs text-brand-forest dark:text-brand-ivory block">
                     Encryption Standards
                   </span>
-                  <p className="text-xs text-brand-muted dark:text-zinc-400">
-                    TLS 1.3 encryption in transit with Perfect Forward Secrecy; AES-256 for all stored brand rules and evidence.
+                  <p className="text-xs text-brand-muted dark:text-zinc-400 leading-relaxed">
+                    All network traffic is enforced via TLS 1.3 with Perfect Forward Secrecy. Database records, Fact Vault documents, and rule embeddings are encrypted at rest with AES-256.
                   </p>
                 </div>
-                <div className="bg-white dark:bg-brand-forest-dark/50 p-4 rounded-xl border border-brand-border dark:border-[#235A4A] space-y-2">
+                <div className="bg-white dark:bg-brand-forest-dark/50 p-4.5 rounded-xl border border-brand-border dark:border-[#235A4A] space-y-2">
                   <span className="font-bold text-xs text-brand-forest dark:text-brand-ivory block">
-                    Role-Based Access Control
+                    Workspace-Scoped Token Expiry
                   </span>
-                  <p className="text-xs text-brand-muted dark:text-zinc-400">
-                    Granular permissions separate Creator, Brand Policy Steward, Legal Counsel, and Workspace Administrator.
+                  <p className="text-xs text-brand-muted dark:text-zinc-400 leading-relaxed">
+                    Sessions auto-expire and enforce granular Role-Based Access Control (RBAC): separating Creators, Stewards, Legal Approvers, and Workspace Admins.
                   </p>
                 </div>
               </div>
@@ -226,83 +227,147 @@ export default function TrustCenterPage() {
             <section id="zero-training" className="scroll-mt-24 space-y-6 pt-6 border-t border-brand-border dark:border-[#235A4A]">
               <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-brand-forest dark:text-emerald-300">
                 <EyeOff aria-hidden="true" className="w-4 h-4 text-brand-coral" />
-                <span>02. Proprietary IP Protection</span>
+                <span>02. Model Governance &amp; IP Protection</span>
               </div>
               <h2 className="text-2xl font-bold font-serif text-brand-ink dark:text-brand-ivory">
                 Zero LLM Training Guarantee
               </h2>
               <p className="text-sm text-brand-muted dark:text-zinc-300 leading-relaxed">
-                Your enterprise collateral, proprietary marketing guidelines, internal brand codices, and confidential disclosures are <strong>NEVER used to train, retune, or evaluate any foundation models</strong>.
+                Markwise uses the <strong>Google Gemini API in strict stateless mode</strong>. Your enterprise collateral, internal policy guidelines, confidential disclosures, and reviewer corrections are <strong>NEVER used to train, retune, or evaluate any foundation models</strong>.
               </p>
 
               <div className="bg-brand-cream dark:bg-brand-forest-dark/60 rounded-2xl border-2 border-emerald-600/30 p-5 space-y-3">
                 <div className="flex items-center gap-2 text-xs font-bold text-emerald-800 dark:text-emerald-300">
                   <CheckCircle2 aria-hidden="true" className="w-4 h-4 text-emerald-600" />
-                  <span>Contractual Non-Training Covenant</span>
+                  <span>Stateless Gemini API Inference Architecture</span>
                 </div>
                 <ul className="space-y-2 text-xs text-brand-muted dark:text-zinc-300">
                   <li className="flex items-start gap-2">
                     <Check aria-hidden="true" className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>API agreements with model providers explicitly bar customer data usage for foundation model training.</span>
+                    <span><strong>Stateless Inference:</strong> Requests are processed in ephemeral memory. No prompts, candidate outputs, or embeddings are retained on Google servers after response completion.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check aria-hidden="true" className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>Payloads are ephemeral: zero model fine-tuning, zero weight updates, zero public leakage.</span>
+                    <span><strong>No Model Retraining:</strong> Enterprise data is legally and technically excluded from foundation model training datasets, weights modification, or global fine-tuning.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check aria-hidden="true" className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>100% Customer IP Ownership: all rules, synthesized amendments, and evidence links remain your sole property.</span>
+                    <span><strong>Customer IP Ownership:</strong> Your brand codices, Fact Vault benchmarks, and synthesized living rules remain 100% proprietary to your enterprise.</span>
                   </li>
                 </ul>
               </div>
             </section>
 
-            {/* Section 3: Responsible AI & Explainability */}
+            {/* Section 3: Responsible AI & Human Approval */}
             <section id="responsible-ai" className="scroll-mt-24 space-y-6 pt-6 border-t border-brand-border dark:border-[#235A4A]">
               <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-brand-forest dark:text-emerald-300">
-                <Sparkles aria-hidden="true" className="w-4 h-4 text-brand-coral" />
-                <span>03. Algorithmic Transparency</span>
+                <UserCheck aria-hidden="true" className="w-4 h-4 text-brand-coral" />
+                <span>03. Algorithmic Gatekeeping</span>
               </div>
               <h2 className="text-2xl font-bold font-serif text-brand-ink dark:text-brand-ivory">
-                Responsible AI &amp; Causal Explainability
+                Responsible AI &amp; Mandatory Human Approval
               </h2>
               <p className="text-sm text-brand-muted dark:text-zinc-300 leading-relaxed">
-                We reject &ldquo;black-box&rdquo; AI confidence scores. Every issue flagged by Markwise must cite an approved rule ID, quote the offending clause, and link to evidence in your Fact Vault.
+                Markwise is architected on a fundamental principle: <strong>the AI assists and flags, but human approval is strictly enforced before publishing</strong>. Content cannot bypass human gatekeepers into public channels.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-                <div className="p-4 rounded-xl bg-white dark:bg-brand-forest-dark/50 border border-brand-border dark:border-[#235A4A] space-y-1">
-                  <span className="font-bold text-brand-forest dark:text-brand-ivory block">Deterministic Attribution</span>
-                  <p className="text-brand-muted dark:text-zinc-400">Flags specify exact rule ID, version number, and citation clause.</p>
+                <div className="p-4.5 rounded-xl bg-white dark:bg-brand-forest-dark/50 border border-brand-border dark:border-[#235A4A] space-y-1.5">
+                  <span className="font-bold text-brand-forest dark:text-brand-ivory block">
+                    Causal Reasoning
+                  </span>
+                  <p className="text-brand-muted dark:text-zinc-400">
+                    No black-box probability scores. Every flag quotes the offending text, cites the exact Rule ID, and explains the statutory or brand rationale.
+                  </p>
                 </div>
-                <div className="p-4 rounded-xl bg-white dark:bg-brand-forest-dark/50 border border-brand-border dark:border-[#235A4A] space-y-1">
-                  <span className="font-bold text-brand-forest dark:text-brand-ivory block">Fact Vault Anchors</span>
-                  <p className="text-brand-muted dark:text-zinc-400">All quantitative claims verify against unexpired audit reports and SEC filings.</p>
+                <div className="p-4.5 rounded-xl bg-white dark:bg-brand-forest-dark/50 border border-brand-border dark:border-[#235A4A] space-y-1.5">
+                  <span className="font-bold text-brand-forest dark:text-brand-ivory block">
+                    Fact Vault Proof Anchors
+                  </span>
+                  <p className="text-brand-muted dark:text-zinc-400">
+                    Numerical assertions and superlatives must anchor to unexpired evidence documents (e.g. SEC filings, clinical reports).
+                  </p>
                 </div>
-                <div className="p-4 rounded-xl bg-white dark:bg-brand-forest-dark/50 border border-brand-border dark:border-[#235A4A] space-y-1">
-                  <span className="font-bold text-brand-forest dark:text-brand-ivory block">Human Gatekeeping</span>
-                  <p className="text-brand-muted dark:text-zinc-400">AI assists and flags; certified human brand stewards hold final publishing power.</p>
+                <div className="p-4.5 rounded-xl bg-white dark:bg-brand-forest-dark/50 border border-brand-border dark:border-[#235A4A] space-y-1.5">
+                  <span className="font-bold text-brand-forest dark:text-brand-ivory block">
+                    Strict Publishing Gate
+                  </span>
+                  <p className="text-brand-muted dark:text-zinc-400">
+                    High-stakes collateral requires multi-tier cryptographic sign-offs from certified Brand Stewards and Legal Counsel.
+                  </p>
                 </div>
               </div>
             </section>
 
-            {/* Section 4: SOC 2 Compliance Roadmap */}
+            {/* Section 4: Audit Trails & SHA-256 Seals */}
+            <section id="audit-trails" className="scroll-mt-24 space-y-6 pt-6 border-t border-brand-border dark:border-[#235A4A]">
+              <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-brand-forest dark:text-emerald-300">
+                <Hash aria-hidden="true" className="w-4 h-4 text-brand-coral" />
+                <span>04. Cryptographic Provenance</span>
+              </div>
+              <h2 className="text-2xl font-bold font-serif text-brand-ink dark:text-brand-ivory">
+                SHA-256 Cryptographic Seals &amp; Versioned Rules
+              </h2>
+              <p className="text-sm text-brand-muted dark:text-zinc-300 leading-relaxed">
+                When an asset clears review and receives final approval, Markwise generates an immutable <strong>SHA-256 cryptographic seal</strong> binding the approved copy, the active rule version, and the reviewer credentials into a tamper-evident audit record.
+              </p>
+
+              <div className="bg-white dark:bg-brand-forest-dark/60 rounded-2xl border border-brand-border dark:border-[#235A4A] p-5 sm:p-6 space-y-4 shadow-xs">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-mono text-brand-coral font-bold uppercase tracking-wider">
+                    How Cryptographic Proof Operates
+                  </span>
+                  <h3 className="text-base font-bold text-brand-ink dark:text-brand-ivory font-serif">
+                    End-to-End Verification Pipeline
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                  <div className="p-3.5 rounded-xl bg-brand-cream dark:bg-white/5 border border-brand-border dark:border-[#235A4A] space-y-1">
+                    <span className="font-bold text-brand-forest dark:text-emerald-300 block">
+                      1. Rule Version Snapshot
+                    </span>
+                    <p className="text-brand-muted dark:text-zinc-400">
+                      Rules are anchored to an exact Git-like version hash (e.g. `BR-014 v2.4`). Edits create a new semantic version.
+                    </p>
+                  </div>
+                  <div className="p-3.5 rounded-xl bg-brand-cream dark:bg-white/5 border border-brand-border dark:border-[#235A4A] space-y-1">
+                    <span className="font-bold text-brand-forest dark:text-emerald-300 block">
+                      2. SHA-256 Digest
+                    </span>
+                    <p className="text-brand-muted dark:text-zinc-400">
+                      Generates a cryptographic digest of text + cited evidence + rule set + approver token.
+                    </p>
+                  </div>
+                  <div className="p-3.5 rounded-xl bg-brand-cream dark:bg-white/5 border border-brand-border dark:border-[#235A4A] space-y-1">
+                    <span className="font-bold text-brand-forest dark:text-emerald-300 block">
+                      3. Staging Drift Detection
+                    </span>
+                    <p className="text-brand-muted dark:text-zinc-400">
+                      CMS webhooks verify live URLs against the cryptographic seal, alerting within milliseconds if copy is altered post-signoff.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Section 5: SOC 2 Compliance Roadmap */}
             <section id="soc2-roadmap" className="scroll-mt-24 space-y-6 pt-6 border-t border-brand-border dark:border-[#235A4A]">
               <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-brand-forest dark:text-emerald-300">
                 <ShieldCheck aria-hidden="true" className="w-4 h-4 text-brand-coral" />
-                <span>04. Compliance Roadmap</span>
+                <span>05. Compliance Roadmap</span>
               </div>
               <h2 className="text-2xl font-bold font-serif text-brand-ink dark:text-brand-ivory">
                 SOC 2 Compliance Roadmap
               </h2>
               <p className="text-sm text-brand-muted dark:text-zinc-300 leading-relaxed">
-                Markwise is engineered from ground zero following the AICPA Trust Services Criteria (Security, Availability, Confidentiality). Here is our transparent compliance roadmap:
+                Markwise is engineered from ground zero following the AICPA Trust Services Criteria (Security, Availability, Confidentiality). Here is our transparent roadmap:
               </p>
 
               <div className="space-y-4">
                 <div className="p-5 rounded-2xl bg-white dark:bg-brand-forest-dark/50 border border-brand-border dark:border-[#235A4A] space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-brand-forest dark:text-emerald-300 font-mono">Phase 1: Architecture Alignment (Active)</span>
+                    <span className="font-bold text-brand-forest dark:text-emerald-300 font-mono">Phase 1: Architecture Alignment &amp; Security Controls</span>
                     <span className="bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-bold px-2 py-0.5 rounded text-[10px]">COMPLETE</span>
                   </div>
                   <p className="text-xs text-brand-muted dark:text-zinc-400">
@@ -332,55 +397,30 @@ export default function TrustCenterPage() {
               </div>
             </section>
 
-            {/* Section 5: Security FAQ & CTA */}
-            <section id="security-faq" className="scroll-mt-24 space-y-6 pt-6 border-t border-brand-border dark:border-[#235A4A]">
-              <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-brand-forest dark:text-emerald-300">
-                <FileCheck2 aria-hidden="true" className="w-4 h-4 text-brand-coral" />
-                <span>05. Frequently Asked Questions</span>
+            {/* Bottom CTA */}
+            <div className="bg-brand-cream dark:bg-brand-forest-dark rounded-2xl border border-brand-border dark:border-[#235A4A] p-8 text-center space-y-4">
+              <h3 className="text-xl font-bold font-serif text-brand-forest dark:text-brand-ivory">
+                Experience Enterprise Brand Governance
+              </h3>
+              <p className="text-xs sm:text-sm text-brand-muted dark:text-zinc-300 max-w-lg mx-auto">
+                Test the isolated sandbox, explore the deterministic rule engine, and see how causal explainability protects your brand.
+              </p>
+              <div className="flex items-center justify-center gap-3 pt-2">
+                <Link
+                  href="/login"
+                  className="px-6 py-2.5 text-xs sm:text-sm font-semibold text-white bg-brand-forest dark:bg-brand-coral hover:bg-brand-forest-dark dark:hover:bg-brand-coral-hover rounded-full transition-all inline-flex items-center gap-1.5 shadow-xs"
+                >
+                  <span>Launch Free Sandbox</span>
+                  <ArrowRight aria-hidden="true" className="w-3.5 h-3.5" />
+                </Link>
+                <Link
+                  href="/how-it-works"
+                  className="px-6 py-2.5 text-xs sm:text-sm font-semibold text-brand-forest dark:text-brand-ivory border border-brand-border-dark dark:border-[#235A4A] bg-white dark:bg-white/10 rounded-full hover:bg-white/80 transition-all cursor-pointer"
+                >
+                  <span>The 10-Step Loop</span>
+                </Link>
               </div>
-              <h2 className="text-2xl font-bold font-serif text-brand-ink dark:text-brand-ivory">
-                Architecture FAQ &amp; Legal Covenants
-              </h2>
-
-              <div className="space-y-4 text-xs">
-                <div className="p-5 rounded-xl bg-white dark:bg-brand-forest-dark/50 border border-brand-border dark:border-[#235A4A] space-y-1.5">
-                  <h3 className="font-bold text-sm text-brand-ink dark:text-brand-ivory">
-                    Can Markwise be deployed on private cloud or on-premises?
-                  </h3>
-                  <p className="text-brand-muted dark:text-zinc-300 leading-relaxed">
-                    Yes. Under our Global Sovereign tier, Markwise provides dedicated single-tenant VPC deployments on AWS, Google Cloud, or Microsoft Azure with customer-managed encryption keys (CMEK).
-                  </p>
-                </div>
-
-                <div className="p-5 rounded-xl bg-white dark:bg-brand-forest-dark/50 border border-brand-border dark:border-[#235A4A] space-y-1.5">
-                  <h3 className="font-bold text-sm text-brand-ink dark:text-brand-ivory">
-                    How does Markwise detect staging drift after approval?
-                  </h3>
-                  <p className="text-brand-muted dark:text-zinc-300 leading-relaxed">
-                    Every approved document generates a SHA-256 seal combining content, rule versions, and approver signature. CMS webhooks periodically check published endpoints against this seal to alert on unauthorized modifications.
-                  </p>
-                </div>
-              </div>
-
-              {/* Call to action */}
-              <div className="bg-brand-cream dark:bg-brand-forest-dark rounded-2xl border border-brand-border dark:border-[#235A4A] p-8 text-center space-y-4">
-                <h3 className="text-xl font-bold font-serif text-brand-forest dark:text-brand-ivory">
-                  Ready to test our enterprise security?
-                </h3>
-                <p className="text-xs sm:text-sm text-brand-muted dark:text-zinc-300 max-w-lg mx-auto">
-                  Experience our isolated workspace sandbox and review how deterministic causal reasoning protects your organization.
-                </p>
-                <div className="flex items-center justify-center gap-3 pt-2">
-                  <Link
-                    href="/login"
-                    className="px-6 py-2.5 text-xs sm:text-sm font-semibold text-white bg-brand-forest dark:bg-brand-coral hover:bg-brand-forest-dark dark:hover:bg-brand-coral-hover rounded-full transition-all inline-flex items-center gap-1.5 shadow-xs"
-                  >
-                    <span>Launch Free Sandbox</span>
-                    <ArrowRight aria-hidden="true" className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              </div>
-            </section>
+            </div>
           </main>
         </div>
       </div>
