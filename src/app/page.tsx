@@ -1,25 +1,30 @@
 'use client';
 
 import { Navbar } from '@/components/Navbar';
-import { HeroSection } from '@/components/HeroSection';
-import { FeaturesSection } from '@/components/FeaturesSection';
-import { PricingSection } from '@/components/PricingSection';
-import { Footer } from '@/components/Footer';
+import { Hero } from '@/components/landing/Hero';
+import { FeatureTabs } from '@/components/landing/FeatureTabs';
+import { ComparisonTable } from '@/components/landing/ComparisonTable';
+import { PricingSection } from '@/components/landing/PricingSection';
+import { Footer } from '@/components/landing/Footer';
 
 export default function HomePage() {
   return (
-    <div className="bg-[#F7F2E8] dark:bg-[#123B2F] min-h-screen text-[#242820] dark:text-[#F7F2E8] selection:bg-[#F47745]/20 selection:text-[#174C3B] overflow-x-hidden font-inter transition-colors duration-300">
+    <div className="bg-brand-ivory dark:bg-brand-forest min-h-screen text-brand-ink dark:text-brand-ivory selection:bg-brand-coral/20 selection:text-brand-forest-light overflow-x-hidden font-inter transition-colors duration-300">
       <Navbar />
 
-      <main>
-        <HeroSection />
+      <main className="space-y-20 md:space-y-28">
+        <Hero />
 
-        <section id="features" aria-label="Core Capabilities" className="scroll-mt-24">
-          <FeaturesSection />
+        <section id="features" aria-label="Core Capabilities" className="scroll-mt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FeatureTabs />
+        </section>
+
+        <section id="comparison" aria-label="Competitive Differentiation" className="scroll-mt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <ComparisonTable />
         </section>
 
         <section id="pricing" aria-label="Enterprise Pricing" className="scroll-mt-24">
-          <PricingSection onOpenGetStarted={() => { window.location.href = '/login'; }} />
+          <PricingSection />
         </section>
       </main>
 

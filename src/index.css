@@ -15,10 +15,26 @@
   --color-warm-border: #E8DFD0;
   --color-forest: #123B2F;
   --color-forest-dark: #0c2921;
-  --color-forest-light: #1b5343;
+  --color-forest-light: #174C3B;
   --color-ink: var(--text-primary);
   --color-ink-muted: var(--text-muted);
   --color-ink-subtle: #7A8274;
+
+  /* Brand design tokens */
+  --color-brand-forest: #123B2F;
+  --color-brand-forest-dark: #0c2921;
+  --color-brand-forest-light: #174C3B;
+  --color-brand-coral: #F47745;
+  --color-brand-coral-hover: #dc612e;
+  --color-brand-ivory: #F7F2E8;
+  --color-brand-ivory-light: #FCFAF5;
+  --color-brand-cream: #FAF7F0;
+  --color-brand-border: #E8DFD0;
+  --color-brand-border-dark: #D5CDBD;
+  --color-brand-ink: #242820;
+  --color-brand-muted: #545B4E;
+  --color-brand-subtle: #7A8274;
+
   --font-inter: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-serif: 'Newsreader', Georgia, Cambria, 'Times New Roman', Times, serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
