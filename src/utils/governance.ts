@@ -18,6 +18,7 @@ export interface LoopStep {
   actor: 'AI' | 'Human';
   tagline: string;
   role: string;
+  shortDescription?: string;
   description: string;
   input: string;
   output: string;

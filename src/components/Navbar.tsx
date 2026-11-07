@@ -51,16 +51,16 @@ export function Navbar({}: NavbarProps = {}) {
             aria-label="Main Navigation"
             className="hidden md:flex items-center gap-6 lg:gap-8"
           >
-            {/* Product Dropdown */}
+            {/* Features Dropdown */}
             <div className="relative group">
               <span className="absolute -top-3.5 right-1 bg-brand-forest dark:bg-brand-coral text-white text-[8px] font-bold px-1.5 py-0.2 rounded-full uppercase tracking-wider shadow-2xs">
                 Platform
               </span>
               <button
                 type="button"
-                className="text-xs sm:text-sm font-medium text-[#545B4E] dark:text-[#CBD5C0] hover:text-[#123B2F] dark:hover:text-white transition-colors cursor-pointer inline-flex items-center gap-1 py-1 focus:outline-none"
+                className="text-xs sm:text-sm font-medium text-[#545B4E] dark:text-[#CBD5C0] hover:text-[#123B2F] dark:hover:text-white transition-colors cursor-pointer inline-flex items-center gap-1 py-1 focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none rounded-md"
               >
-                <span>Product</span>
+                <span>Features</span>
                 <ChevronDown aria-hidden="true" className="w-3 h-3 text-[#7A8274] dark:text-[#CBD5C0] group-hover:rotate-180 transition-transform duration-200" />
               </button>
 
