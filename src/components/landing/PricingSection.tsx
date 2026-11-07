@@ -88,7 +88,7 @@ export function PricingSection() {
                     <ul className="space-y-2.5">
                       {plan.features.map((feat) => (
                         <li key={feat} className="flex items-start gap-2.5 text-xs sm:text-sm text-brand-ink dark:text-brand-ivory">
-                          <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                          <Check aria-hidden="true" className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                           <span>{feat}</span>
                         </li>
                       ))}
@@ -121,10 +121,10 @@ export function PricingSection() {
         <div className="bg-white dark:bg-brand-forest/30 border border-brand-border dark:border-[#235A4A] rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xs">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-brand-forest/10 text-brand-forest dark:text-brand-ivory flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-6 h-6 stroke-[2]" />
+              <ShieldCheck aria-hidden="true" className="w-6 h-6 stroke-[2]" />
             </div>
             <div>
-              <h4 className="font-bold text-base text-brand-ink dark:text-brand-ivory font-serif">Need Custom Security & Data Retention Covenants?</h4>
+              <h3 className="font-bold text-base text-brand-ink dark:text-brand-ivory font-serif">Need Custom Security & Data Retention Covenants?</h3>
               <p className="text-xs sm:text-sm text-brand-muted dark:text-zinc-300 mt-0.5">We sign Business Associate Agreements (BAA), custom DPAs, and provide dedicated single-tenant VPC options.</p>
             </div>
           </div>

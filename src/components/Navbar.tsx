@@ -37,7 +37,7 @@ export function Navbar({}: NavbarProps = {}) {
           >
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#123B2F] dark:bg-white text-white dark:text-[#123B2F] flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform duration-200">
               {/* 8-pointed star / compass emblem */}
-              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+              <svg aria-hidden="true" className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                 <path d="M12 2L14.2 9.8L22 12L14.2 14.2L12 22L9.8 14.2L2 12L9.8 9.8L12 2Z" />
               </svg>
             </div>
@@ -68,7 +68,7 @@ export function Navbar({}: NavbarProps = {}) {
                 className="text-xs sm:text-sm font-medium text-[#545B4E] dark:text-[#CBD5C0] hover:text-[#123B2F] dark:hover:text-white transition-colors cursor-pointer inline-flex items-center gap-1 py-1"
               >
                 <span>Features</span>
-                <ChevronDown className="w-3 h-3 text-[#7A8274] dark:text-[#CBD5C0] group-hover:rotate-180 transition-transform duration-200" />
+                <ChevronDown aria-hidden="true" className="w-3 h-3 text-[#7A8274] dark:text-[#CBD5C0] group-hover:rotate-180 transition-transform duration-200" />
               </a>
 
               {/* Dropdown Menu */}
@@ -123,9 +123,9 @@ export function Navbar({}: NavbarProps = {}) {
               aria-label="Toggle theme"
             >
               {mounted && resolvedTheme === 'dark' ? (
-                <Sun className="w-4 h-4 text-amber-300 transition-transform duration-200" />
+                <Sun aria-hidden="true" className="w-4 h-4 text-amber-300 transition-transform duration-200" />
               ) : (
-                <Moon className="w-4 h-4 text-[#545B4E] transition-transform duration-200" />
+                <Moon aria-hidden="true" className="w-4 h-4 text-[#545B4E] transition-transform duration-200" />
               )}
             </button>
 
@@ -143,7 +143,7 @@ export function Navbar({}: NavbarProps = {}) {
               className="min-h-[44px] px-5 sm:px-6 py-2.5 text-xs sm:text-sm font-medium text-white bg-[#123B2F] dark:bg-[#F47745] hover:bg-[#1A4C3E] dark:hover:bg-[#dc612e] rounded-full transition-all shadow-xs hover:shadow-sm cursor-pointer inline-flex items-center gap-2 active:scale-98 focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
             >
               <span>Book Demo</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight aria-hidden="true" className="w-3.5 h-3.5" />
             </Link>
           </div>
 
@@ -156,9 +156,9 @@ export function Navbar({}: NavbarProps = {}) {
               aria-label="Toggle theme"
             >
               {mounted && resolvedTheme === 'dark' ? (
-                <Sun className="w-4 h-4 text-amber-300" />
+                <Sun aria-hidden="true" className="w-4 h-4 text-amber-300" />
               ) : (
-                <Moon className="w-4 h-4 text-[#545B4E]" />
+                <Moon aria-hidden="true" className="w-4 h-4 text-[#545B4E]" />
               )}
             </button>
             <Link
@@ -173,7 +173,7 @@ export function Navbar({}: NavbarProps = {}) {
               className="w-11 h-11 text-[#123B2F] dark:text-[#F7F2E8] hover:text-[#C85A32] rounded-full border border-[#D5CDBD] dark:border-[#235A4A] bg-white/60 dark:bg-white/10 flex items-center justify-center cursor-pointer focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
               aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
-              {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              {mobileMenuOpen ? <X aria-hidden="true" className="w-4 h-4" /> : <Menu aria-hidden="true" className="w-4 h-4" />}
             </button>
           </div>
         </div>
@@ -233,7 +233,7 @@ export function Navbar({}: NavbarProps = {}) {
               className="w-full py-2.5 text-xs sm:text-sm font-semibold text-white bg-[#123B2F] dark:bg-[#F47745] hover:bg-[#1A4C3E] rounded-full transition-colors text-center inline-flex items-center justify-center gap-1.5"
             >
               <span>Book Demo</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight aria-hidden="true" className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>

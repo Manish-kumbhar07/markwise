@@ -95,27 +95,27 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
                 {/* Navigation Items */}
                 <nav className="space-y-1 mt-3">
                   <div className="bg-white/15 text-white font-medium px-2 py-1.5 rounded-md flex items-center gap-2 text-[11px] shadow-2xs">
-                    <LayoutDashboard className="w-3.5 h-3.5 text-[#F47745]" />
+                    <LayoutDashboard aria-hidden="true" className="w-3.5 h-3.5 text-[#F47745]" />
                     <span>Review Cockpit</span>
                   </div>
                   <div className="text-[#A2B8AB] hover:text-white px-2 py-1.5 rounded-md flex items-center gap-2 text-[11px] transition-colors cursor-pointer">
-                    <BarChart2 className="w-3.5 h-3.5" />
+                    <BarChart2 aria-hidden="true" className="w-3.5 h-3.5" />
                     <span>Telemetry</span>
                   </div>
                   <div className="text-[#A2B8AB] hover:text-white px-2 py-1.5 rounded-md flex items-center gap-2 text-[11px] transition-colors cursor-pointer">
-                    <FileCode2 className="w-3.5 h-3.5" />
+                    <FileCode2 aria-hidden="true" className="w-3.5 h-3.5" />
                     <span>Brand Rules</span>
                   </div>
                   <div className="text-[#A2B8AB] hover:text-white px-2 py-1.5 rounded-md flex items-center gap-2 text-[11px] transition-colors cursor-pointer">
-                    <Database className="w-3.5 h-3.5" />
+                    <Database aria-hidden="true" className="w-3.5 h-3.5" />
                     <span>Fact Vault</span>
                   </div>
                   <div className="text-[#A2B8AB] hover:text-white px-2 py-1.5 rounded-md flex items-center gap-2 text-[11px] transition-colors cursor-pointer">
-                    <Network className="w-3.5 h-3.5" />
+                    <Network aria-hidden="true" className="w-3.5 h-3.5" />
                     <span>Approval Matrix</span>
                   </div>
                   <div className="text-[#A2B8AB] hover:text-white px-2 py-1.5 rounded-md flex items-center gap-2 text-[11px] transition-colors cursor-pointer">
-                    <Settings className="w-3.5 h-3.5" />
+                    <Settings aria-hidden="true" className="w-3.5 h-3.5" />
                     <span>Settings</span>
                   </div>
                 </nav>
@@ -148,12 +148,12 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
                   >
                     {isLoading ? (
                       <>
-                        <Loader2 className="w-3 h-3 animate-spin text-[#F47745]" />
+                        <Loader2 aria-hidden="true" className="w-3 h-3 animate-spin text-[#F47745]" />
                         <span>Auditing...</span>
                       </>
                     ) : (
                       <>
-                        <Sparkles className="w-3 h-3 text-[#F47745]" />
+                        <Sparkles aria-hidden="true" className="w-3 h-3 text-[#F47745]" />
                         <span>Run Review</span>
                       </>
                     )}
@@ -181,12 +181,12 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
                     <span className="font-mono">
                       {isAccepted ? (
                         <span className="text-emerald-700 font-semibold inline-flex items-center gap-1">
-                          <Check className="w-3 h-3 stroke-[2.5]" />
+                          <Check aria-hidden="true" className="w-3 h-3 stroke-[2.5]" />
                           <span>Compliant Phrasing</span>
                         </span>
                       ) : hasRunReview ? (
                         <span className="text-[#C85A32] font-semibold inline-flex items-center gap-1">
-                          <AlertTriangle className="w-3 h-3" />
+                          <AlertTriangle aria-hidden="true" className="w-3 h-3" />
                           <span>1 Issue Flagged</span>
                         </span>
                       ) : (
@@ -206,7 +206,7 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
               <div className="pt-2 border-t border-[#E8DFD0] flex items-center justify-between text-[10px] text-[#7A8274] select-none">
                 <span>Words: {wordCount}</span>
                 <span className="flex items-center gap-1 text-[#3B4D3C] font-medium">
-                  <Check className="w-3 h-3 text-emerald-600 stroke-[2.5]" />
+                  <Check aria-hidden="true" className="w-3 h-3 text-emerald-600 stroke-[2.5]" />
                   <span>Interactive Loop</span>
                 </span>
               </div>
@@ -257,7 +257,7 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
                 {/* State 1: Simulating AI Thinking (Loading 1.5s) */}
                 {isLoading && (
                   <div className="mt-2.5 p-3 rounded-xl bg-white border border-[#E8DFD0] space-y-2.5 shadow-2xs text-center min-h-[200px] flex flex-col items-center justify-center animate-in fade-in">
-                    <Loader2 className="w-6 h-6 animate-spin text-[#123B2F]" />
+                    <Loader2 aria-hidden="true" className="w-6 h-6 animate-spin text-[#123B2F]" />
                     <div className="text-[11px] font-bold text-[#123B2F]">
                       Simulating AI Reasoning...
                     </div>
@@ -271,7 +271,7 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
                 {!isLoading && !hasRunReview && !isAccepted && (
                   <div className="mt-2.5 p-3 rounded-xl bg-white border border-dashed border-[#D5CDBD] space-y-2 shadow-2xs text-center min-h-[200px] flex flex-col items-center justify-center">
                     <div className="w-7 h-7 rounded-full bg-[#123B2F]/10 text-[#123B2F] flex items-center justify-center">
-                      <Sparkles className="w-3.5 h-3.5 text-[#F47745]" />
+                      <Sparkles aria-hidden="true" className="w-3.5 h-3.5 text-[#F47745]" />
                     </div>
                     <div className="text-[11px] font-bold text-[#123B2F]">
                       Pre-Publish Audit
@@ -284,7 +284,7 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
                       onClick={handleRunReview}
                       className="px-2.5 py-1 text-[9px] font-semibold text-white bg-[#123B2F] hover:bg-[#1A4C3E] rounded-md transition-all shadow-2xs cursor-pointer flex items-center gap-1 active:scale-95 focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
                     >
-                      <Sparkles className="w-2.5 h-2.5 text-[#F47745]" />
+                      <Sparkles aria-hidden="true" className="w-2.5 h-2.5 text-[#F47745]" />
                       <span>Run Review</span>
                     </button>
                   </div>
@@ -300,14 +300,14 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
                       </span>
                       <span className="text-[9px] text-[#4B5563] flex items-center gap-0.5 font-medium">
                         <span>Score impact</span>
-                        <AlertTriangle className="w-2.5 h-2.5 text-[#C53030]" />
+                        <AlertTriangle aria-hidden="true" className="w-2.5 h-2.5 text-[#C53030]" />
                       </span>
                     </div>
 
                     {/* Issue Title */}
-                    <h4 className="text-[11px] font-bold text-[#242820] leading-tight">
+                    <p className="text-[11px] font-bold text-[#242820] leading-tight">
                       Unsupported performance claim
-                    </h4>
+                    </p>
 
                     {/* WHY Details with WCAG AA compliant #4B5563 contrast */}
                     <div className="text-[10px] space-y-0.5">
@@ -342,7 +342,7 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
                     {/* AI Badge & Apply Fix Button */}
                     <div className="pt-1 flex items-center justify-between gap-1.5">
                       <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-[#EDE5F7] text-[#6B46C1] border border-[#6B46C1]/20 text-[8px] font-medium">
-                        <Sparkles className="w-2 h-2" />
+                        <Sparkles aria-hidden="true" className="w-2 h-2" />
                         <span>AI-assisted</span>
                       </span>
 
@@ -353,7 +353,7 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
                           className="px-2.5 py-1 text-[9px] font-semibold text-white bg-[#123B2F] hover:bg-[#1A4C3E] rounded transition-colors shadow-2xs cursor-pointer flex items-center gap-1 active:scale-95 focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none"
                         >
                           <span>Apply Fix</span>
-                          <Check className="w-2.5 h-2.5" />
+                          <Check aria-hidden="true" className="w-2.5 h-2.5" />
                         </button>
                       </div>
                     </div>
@@ -364,7 +364,7 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
                 {!isLoading && isAccepted && (
                   <div className="mt-2.5 p-3 rounded-xl bg-[#E5EEDC]/60 border border-emerald-300 space-y-2 text-center animate-in fade-in duration-200">
                     <div className="w-7 h-7 mx-auto rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                      <Check className="w-4 h-4 stroke-[2.5]" />
+                      <Check aria-hidden="true" className="w-4 h-4 stroke-[2.5]" />
                     </div>
                     <div className="text-xs font-bold text-[#123B2F]">
                       Issue Resolved
@@ -377,7 +377,7 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
                       onClick={handleReset}
                       className="text-[9px] font-mono text-[#123B2F] underline hover:text-[#C85A32] cursor-pointer pt-1 flex items-center justify-center gap-1 mx-auto focus-visible:ring-2 focus-visible:ring-[#F47745] focus-visible:outline-none rounded"
                     >
-                      <RotateCcw className="w-2.5 h-2.5" />
+                      <RotateCcw aria-hidden="true" className="w-2.5 h-2.5" />
                       <span>Reset demo</span>
                     </button>
                   </div>

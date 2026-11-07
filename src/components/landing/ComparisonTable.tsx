@@ -41,12 +41,12 @@ export function ComparisonTable() {
     <div className="w-full space-y-6">
       <div className="text-center max-w-3xl mx-auto space-y-2">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-forest/10 dark:bg-white/10 text-brand-forest dark:text-brand-ivory border border-brand-forest/20 dark:border-white/20">
-          <Shield className="w-3.5 h-3.5 text-brand-coral" />
+          <Shield aria-hidden="true" className="w-3.5 h-3.5 text-brand-coral" />
           <span>Competitive Differentiation</span>
         </div>
-        <h3 className="text-2xl sm:text-4xl font-bold tracking-tight text-brand-ink dark:text-brand-ivory font-serif">
+        <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-brand-ink dark:text-brand-ivory font-serif">
           Markwise vs. Generic AI
-        </h3>
+        </h2>
         <p className="text-xs sm:text-sm text-brand-muted dark:text-zinc-300 max-w-2xl mx-auto">
           Generic foundation models generate persuasive words. Markwise guarantees factual accuracy, legal defensibility, and continuous organizational learning.
         </p>
@@ -68,7 +68,7 @@ export function ComparisonTable() {
                 </th>
                 <th className="py-4 px-5 text-xs font-bold text-brand-forest dark:text-emerald-300 uppercase tracking-wider w-3/10 text-center bg-brand-forest/10 dark:bg-brand-forest/70 border-l border-r border-brand-border-dark dark:border-[#235A4A]">
                   <div className="flex items-center justify-center gap-1">
-                    <Sparkles className="w-3.5 h-3.5 text-brand-coral" />
+                    <Sparkles aria-hidden="true" className="w-3.5 h-3.5 text-brand-coral" />
                     <span>Markwise</span>
                   </div>
                   <span className="block text-[10px] font-mono text-emerald-800 dark:text-emerald-300 font-semibold normal-case mt-0.5">
@@ -88,12 +88,12 @@ export function ComparisonTable() {
                     <div className="flex flex-col items-center justify-center gap-1">
                       {row.generic.ok ? (
                         <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-bold text-xs border border-emerald-200 dark:border-emerald-800">
-                          <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                          <Check aria-hidden="true" className="w-3.5 h-3.5 stroke-[2.5]" />
                           <span>Yes</span>
                         </div>
                       ) : (
                         <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 font-bold text-xs border border-rose-200 dark:border-rose-900">
-                          <X className="w-3.5 h-3.5 stroke-[2.5]" />
+                          <X aria-hidden="true" className="w-3.5 h-3.5 stroke-[2.5]" />
                           <span>No</span>
                         </div>
                       )}
@@ -106,7 +106,7 @@ export function ComparisonTable() {
                   <td className="py-4 px-5 text-center bg-brand-forest/5 dark:bg-brand-forest/70 border-l border-r border-brand-border-dark dark:border-[#235A4A]">
                     <div className="flex flex-col items-center justify-center gap-1">
                       <div className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full bg-brand-forest-light dark:bg-emerald-600 text-white font-bold text-xs shadow-2xs">
-                        <Check className="w-3.5 h-3.5 stroke-[3]" />
+                        <Check aria-hidden="true" className="w-3.5 h-3.5 stroke-[3]" />
                         <span>Yes</span>
                       </div>
                       <span className="text-[11px] text-brand-forest-dark dark:text-emerald-200 font-medium max-w-[200px] leading-tight mt-0.5">

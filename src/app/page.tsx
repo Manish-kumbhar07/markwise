@@ -12,7 +12,7 @@ export default function HomePage() {
     <div className="bg-brand-ivory dark:bg-brand-forest min-h-screen text-brand-ink dark:text-brand-ivory selection:bg-brand-coral/20 selection:text-brand-forest-light overflow-x-hidden font-inter transition-colors duration-300">
       <Navbar />
 
-      <main className="space-y-20 md:space-y-28">
+      <main id="main-content" tabIndex={-1} className="space-y-20 md:space-y-28 focus:outline-none">
         <Hero />
 
         <section id="features" aria-label="Core Capabilities" className="scroll-mt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

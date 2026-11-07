@@ -12,7 +12,7 @@ export function Footer() {
           <div className="md:col-span-2 space-y-3">
             <Link href="/" className="flex items-center gap-2.5 text-brand-forest dark:text-brand-ivory text-left cursor-pointer">
               <div className="w-8 h-8 rounded-lg bg-brand-forest flex items-center justify-center text-white shadow-2xs">
-                <Shield className="w-4 h-4 stroke-[2.2]" />
+                <Shield aria-hidden="true" className="w-4 h-4 stroke-[2.2]" />
               </div>
               <span className="text-lg font-bold tracking-tight text-brand-forest dark:text-brand-ivory font-serif">
                 Markwise

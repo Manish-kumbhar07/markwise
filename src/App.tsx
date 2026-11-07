@@ -6,15 +6,7 @@
 import { useState, useEffect } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { GlobalDashboardLayout } from './components/dashboard/GlobalDashboardLayout';
-import { Navbar } from './components/Navbar';
-import { HeroSection } from './components/HeroSection';
-import { TheLoopSection } from './components/TheLoopSection';
-import { LiveInspector } from './components/LiveInspector';
-import { FeaturesSection } from './components/FeaturesSection';
-import { PricingSection } from './components/PricingSection';
-import { EnterpriseTrust } from './components/EnterpriseTrust';
-import { Footer } from './components/Footer';
-import { BackgroundDecoration } from './components/BackgroundDecoration';
+import HomePage from './app/page';
 import { GetStartedModal } from './components/modals/GetStartedModal';
 import { DocsModal } from './components/modals/DocsModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -27,7 +19,6 @@ import TrustCenterPage from './app/trust/page';
 import HowItWorksPage from './app/how-it-works/page';
 import NotFoundPage from './app/not-found';
 import { createClient } from '@/utils/supabase/client';
-import { ActiveTab } from './utils/governance';
 import { DashboardPage } from './utils/dashboard';
 
 export default function App() {
@@ -37,7 +28,6 @@ export default function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
 
-  const [activeLandingTab, setActiveLandingTab] = useState<ActiveTab>('loop');
   const [isGetStartedOpen, setIsGetStartedOpen] = useState(false);
   const [isDocsOpen, setIsDocsOpen] = useState(false);
 
@@ -181,39 +171,18 @@ export default function App() {
   return (
     <ThemeProvider>
       <ErrorBoundary>
-        <div className="min-h-screen bg-[#F7F2E8] dark:bg-[#123B2F] text-[#242820] dark:text-[#F7F2E8] relative flex flex-col font-inter selection:bg-[#F47745]/20 selection:text-[#174C3B] overflow-x-hidden transition-colors duration-300">
-          <BackgroundDecoration />
-          <Navbar
-            onOpenLogin={() => navigate('/login')}
-            onOpenGetStarted={() => navigate('/login')}
-          />
-
-          <main className="flex-1">
-            <HeroSection />
-
-            <section id="features" aria-label="Core Capabilities" className="scroll-mt-24">
-              <FeaturesSection />
-              <EnterpriseTrust />
-            </section>
-
-            <section id="pricing" aria-label="Enterprise Pricing" className="scroll-mt-24">
-              <PricingSection onOpenGetStarted={() => navigate('/login')} />
-            </section>
-          </main>
-
-          <Footer
-            onSelectTab={setActiveLandingTab}
-            onOpenLogin={() => navigate('/login')}
-            onOpenGetStarted={() => navigate('/login')}
-            onOpenDocs={() => navigate('/docs')}
-          />
-
-          <GetStartedModal
-            isOpen={isGetStartedOpen}
-            onClose={() => setIsGetStartedOpen(false)}
-          />
-          <DocsModal isOpen={isDocsOpen} onClose={() => setIsDocsOpen(false)} />
-        </div>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2.5 focus:bg-[#F47745] focus:text-white focus:font-semibold focus:text-sm focus:rounded-lg focus:shadow-xl focus:ring-2 focus:ring-[#123B2F] focus:outline-none transition-all"
+        >
+          Skip to main content
+        </a>
+        <HomePage />
+        <GetStartedModal
+          isOpen={isGetStartedOpen}
+          onClose={() => setIsGetStartedOpen(false)}
+        />
+        <DocsModal isOpen={isDocsOpen} onClose={() => setIsDocsOpen(false)} />
       </ErrorBoundary>
     </ThemeProvider>
   );

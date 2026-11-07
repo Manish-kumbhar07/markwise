@@ -14,7 +14,7 @@ export function Hero() {
           {/* Left Column: Value Proposition & CTAs */}
           <div className="lg:col-span-5 text-left space-y-6">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-brand-forest/10 dark:bg-white/10 text-brand-forest dark:text-brand-ivory border border-brand-forest/20 dark:border-white/20 shadow-2xs">
-              <Shield className="w-3.5 h-3.5 text-brand-coral stroke-[2.5]" />
+              <Shield aria-hidden="true" className="w-3.5 h-3.5 text-brand-coral stroke-[2.5]" />
               <span>Enterprise AI Brand Governance</span>
             </div>
 
@@ -32,14 +32,14 @@ export function Hero() {
                 className="px-7 py-3.5 text-xs sm:text-sm font-semibold text-white bg-brand-forest dark:bg-brand-coral hover:bg-brand-forest-dark dark:hover:bg-brand-coral-hover rounded-full transition-all duration-150 cursor-pointer active:scale-[0.98] inline-flex items-center justify-center gap-2 shadow-xs min-h-[44px] focus-visible:ring-2 focus-visible:ring-brand-coral focus-visible:outline-none"
               >
                 <span>Launch Free Sandbox</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight aria-hidden="true" className="w-4 h-4" />
               </Link>
 
               <Link
                 href="/docs"
                 className="px-7 py-3.5 text-xs sm:text-sm font-semibold text-brand-forest dark:text-brand-ivory border border-brand-border-dark dark:border-white/20 bg-white/70 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 rounded-full transition-all duration-150 cursor-pointer active:scale-[0.98] inline-flex items-center justify-center gap-2 shadow-2xs min-h-[44px] focus-visible:ring-2 focus-visible:ring-brand-coral focus-visible:outline-none"
               >
-                <BookOpen className="w-4 h-4 text-brand-forest dark:text-brand-ivory" />
+                <BookOpen aria-hidden="true" className="w-4 h-4 text-brand-forest dark:text-brand-ivory" />
                 <span>Read the Docs</span>
               </Link>
             </div>

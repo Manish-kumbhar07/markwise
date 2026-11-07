@@ -20,19 +20,19 @@ export function FeatureTabs() {
       <div className="bg-brand-cream dark:bg-brand-forest/60 rounded-3xl border border-brand-border dark:border-[#235A4A] p-6 sm:p-8 shadow-xs space-y-6">
         <div className="text-center max-w-2xl mx-auto space-y-1">
           <span className="text-[10px] font-mono uppercase tracking-widest font-bold text-brand-coral">The Governance Shift</span>
-          <h3 className="text-2xl sm:text-3xl font-bold text-brand-forest dark:text-brand-ivory font-serif">Stop relying on static PDF guidelines that nobody reads.</h3>
+          <h2 className="text-2xl sm:text-3xl font-bold text-brand-forest dark:text-brand-ivory font-serif">Stop relying on static PDF guidelines that nobody reads.</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
           <div className="bg-white/90 dark:bg-black/20 rounded-2xl border border-rose-200 dark:border-rose-900/40 p-5 space-y-2.5">
             <div className="flex items-center gap-2 font-bold text-rose-700 dark:text-rose-400">
-              <span className="w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center text-xs"><X className="w-3.5 h-3.5 stroke-[3]" /></span>
+              <span className="w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center text-xs"><X aria-hidden="true" className="w-3.5 h-3.5 stroke-[3]" /></span>
               <span>The Old Way: Static Brand PDFs</span>
             </div>
             <p className="text-brand-muted dark:text-zinc-400">80-page PDFs gather dust on intranet folders. Legal reviews take 11 days, stalling launches and letting unverified claims leak into production.</p>
           </div>
           <div className="bg-white/90 dark:bg-black/20 rounded-2xl border-2 border-emerald-500/50 p-5 space-y-2.5">
             <div className="flex items-center gap-2 font-bold text-emerald-800 dark:text-emerald-300">
-              <span className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center text-xs"><Check className="w-3.5 h-3.5 stroke-[3]" /></span>
+              <span className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center text-xs"><Check aria-hidden="true" className="w-3.5 h-3.5 stroke-[3]" /></span>
               <span>The Markwise Way: Living Executable Codex</span>
             </div>
             <p className="text-brand-ink dark:text-zinc-200">Sub-second scans check copy against active rules with causal explanations, Fact Vault evidence, and continuous learning from editor decisions.</p>
@@ -45,7 +45,7 @@ export function FeatureTabs() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <span className="text-xs font-mono uppercase tracking-wider font-bold text-brand-forest dark:text-emerald-300">Architecture Explorer</span>
-            <h3 className="text-2xl sm:text-3xl font-bold text-brand-ink dark:text-brand-ivory font-serif">The Four Pillars of Brand Governance</h3>
+            <h2 className="text-2xl sm:text-3xl font-bold text-brand-ink dark:text-brand-ivory font-serif">The Four Pillars of Brand Governance</h2>
           </div>
           <div className="flex items-center gap-1.5 bg-brand-cream dark:bg-brand-forest/60 p-1 rounded-xl border border-brand-border dark:border-[#235A4A] overflow-x-auto max-w-full">
             {FEATURES.map((feat) => (
@@ -81,10 +81,10 @@ export function FeatureTabs() {
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-1 text-xs font-bold text-brand-forest dark:text-emerald-300">
-                    <Icon className="w-4 h-4 stroke-[2]" />
+                    <Icon aria-hidden="true" className="w-4 h-4 stroke-[2]" />
                     <span>{feat.tag}</span>
                   </div>
-                  <h4 className="text-sm font-bold text-brand-ink dark:text-brand-ivory">{feat.title}</h4>
+                  <h3 className="text-sm font-bold text-brand-ink dark:text-brand-ivory">{feat.title}</h3>
                   <p className="text-xs text-brand-muted dark:text-zinc-400 mt-1 line-clamp-2">{feat.desc}</p>
                 </button>
               );
@@ -106,7 +106,7 @@ export function FeatureTabs() {
               <FeatureMockRenderer activeTab={activeTab} />
             </div>
             <div className="bg-brand-cream dark:bg-brand-forest-dark border-t border-brand-border dark:border-[#235A4A] px-5 py-2.5 flex items-center justify-between text-xs text-brand-muted dark:text-zinc-400">
-              <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /><span>Enterprise Governance Core</span></span>
+              <span className="flex items-center gap-1.5"><ShieldCheck aria-hidden="true" className="w-3.5 h-3.5 text-emerald-600" /><span>Enterprise Governance Core</span></span>
               <span className="font-semibold text-brand-forest dark:text-emerald-300">100% Causal Explainability</span>
             </div>
           </div>
