@@ -1,17 +1,24 @@
 import { useState } from 'react';
-import { Check, ShieldCheck, ArrowRight, Sparkles, Building, Lock } from 'lucide-react';
+import Link from 'next/link';
+import { Check, ShieldCheck, ArrowRight } from 'lucide-react';
 import { calculatePlanPrice, PricingPlan } from '../utils/governance';
 
 interface PricingSectionProps {
-  onOpenGetStarted: () => void;
+  onOpenGetStarted?: () => void;
 }
+
+export const PRICING_DATA = {
+  growth: { monthly: 490, annual: 392 },
+  enterprise: { monthly: 1250, annual: 1000 },
+  custom: { monthly: 3200, annual: 2560 },
+};
 
 const PLANS: PricingPlan[] = [
   {
     id: 'growth',
     name: 'Growth Governance',
-    monthlyPrice: 590,
-    annualPricePerMonth: 490,
+    monthlyPrice: PRICING_DATA.growth.monthly,
+    annualPricePerMonth: PRICING_DATA.growth.annual,
     seatsIncluded: 10,
     costPerExtraSeat: 35,
     description: 'For growing marketing, content, and communications teams establishing rigorous brand safety.',
@@ -29,8 +36,8 @@ const PLANS: PricingPlan[] = [
   {
     id: 'enterprise',
     name: 'Enterprise Governance',
-    monthlyPrice: 1490,
-    annualPricePerMonth: 1250,
+    monthlyPrice: PRICING_DATA.enterprise.monthly,
+    annualPricePerMonth: PRICING_DATA.enterprise.annual,
     seatsIncluded: 25,
     costPerExtraSeat: 30,
     badge: 'Most Popular for Enterprise',
@@ -50,8 +57,8 @@ const PLANS: PricingPlan[] = [
   {
     id: 'custom',
     name: 'Global Sovereign',
-    monthlyPrice: 3200,
-    annualPricePerMonth: 2750,
+    monthlyPrice: PRICING_DATA.custom.monthly,
+    annualPricePerMonth: PRICING_DATA.custom.annual,
     seatsIncluded: 100,
     costPerExtraSeat: 25,
     description: 'For global conglomerates, defense, and multinational health systems requiring sovereign cloud isolation.',
@@ -68,9 +75,9 @@ const PLANS: PricingPlan[] = [
   },
 ];
 
-export function PricingSection({ onOpenGetStarted }: PricingSectionProps) {
+export function PricingSection({ onOpenGetStarted }: PricingSectionProps = {}) {
   const [isAnnual, setIsAnnual] = useState<boolean>(true);
-  const [extraSeats, setExtraSeats] = useState<number>(0);
+  const [extraSeats] = useState<number>(0);
 
   return (
     <section id="pricing" className="py-20 md:py-28 bg-[#FCFAF5] border-t border-[#E8DFD0] relative z-10">
@@ -84,18 +91,20 @@ export function PricingSection({ onOpenGetStarted }: PricingSectionProps) {
             Predictable brand protection.
           </h2>
           <p className="mt-4 text-base sm:text-lg text-[#545B4E]">
-            One regulatory fine or brand PR crisis costs millions. Markwise provides continuous peace of mind starting at $490/month.
+            One regulatory fine or brand PR crisis costs millions. Markwise provides continuous peace of mind starting at {isAnnual ? '$392' : '$490'}/month.
           </p>
 
           {/* Billing Cycle Toggle */}
           <div className="mt-8 flex items-center justify-center gap-3">
-            <span
-              className={`text-sm font-semibold transition-colors ${
-                !isAnnual ? 'text-[#242820]' : 'text-[#7A8274]'
+            <button
+              type="button"
+              onClick={() => setIsAnnual(false)}
+              className={`text-sm font-semibold transition-colors cursor-pointer ${
+                !isAnnual ? 'text-[#242820] font-bold' : 'text-[#7A8274] hover:text-[#242820]'
               }`}
             >
               Monthly Billing
-            </span>
+            </button>
 
             <button
               type="button"
@@ -112,16 +121,18 @@ export function PricingSection({ onOpenGetStarted }: PricingSectionProps) {
               />
             </button>
 
-            <span
-              className={`text-sm font-semibold transition-colors flex items-center gap-2 ${
-                isAnnual ? 'text-[#242820]' : 'text-[#7A8274]'
+            <button
+              type="button"
+              onClick={() => setIsAnnual(true)}
+              className={`text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer ${
+                isAnnual ? 'text-[#242820] font-bold' : 'text-[#7A8274] hover:text-[#242820]'
               }`}
             >
               <span>Annual Billing</span>
               <span className="text-xs font-bold text-[#F47745] bg-[#F47745]/10 px-2 py-0.5 rounded-full border border-[#F47745]/20">
                 Save 20%
               </span>
-            </span>
+            </button>
           </div>
         </div>
 
@@ -196,18 +207,18 @@ export function PricingSection({ onOpenGetStarted }: PricingSectionProps) {
 
                 {/* Card CTA */}
                 <div className="mt-8 pt-6 border-t border-[#E8DFD0]">
-                  <button
-                    type="button"
+                  <Link
+                    href="/login"
                     onClick={onOpenGetStarted}
-                    className={`w-full py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-150 inline-flex items-center justify-center gap-2 cursor-pointer ${
+                    className={`w-full py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-150 inline-flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] ${
                       isFeatured
-                        ? 'bg-[#F47745] hover:bg-[#dc612e] text-white shadow-xs active:scale-[0.98]'
-                        : 'bg-[#174C3B] hover:bg-[#0e3025] text-white active:scale-[0.98]'
+                        ? 'bg-[#F47745] hover:bg-[#dc612e] text-white shadow-xs'
+                        : 'border-2 border-[#174C3B] text-[#174C3B] hover:bg-[#174C3B] hover:text-white dark:border-[#E5EEDC] dark:text-[#E5EEDC] dark:hover:bg-[#E5EEDC] dark:hover:text-[#123B2F]'
                     }`}
                   >
-                    <span>{plan.id === 'custom' ? 'Contact Enterprise Sales' : 'Start 14-Day Pilot'}</span>
+                    <span>Start Free Pilot</span>
                     <ArrowRight className="w-4 h-4" />
-                  </button>
+                  </Link>
                   <p className="mt-2 text-center text-[11px] text-[#7A8274]">
                     No credit card required for pilot setup
                   </p>
@@ -235,7 +246,7 @@ export function PricingSection({ onOpenGetStarted }: PricingSectionProps) {
           <button
             type="button"
             onClick={onOpenGetStarted}
-            className="px-5 py-2.5 text-xs sm:text-sm font-semibold text-[#174C3B] border border-[#174C3B]/30 hover:bg-[#FAF6EF] rounded-xl transition-colors whitespace-nowrap shrink-0"
+            className="px-5 py-2.5 text-xs sm:text-sm font-semibold text-[#174C3B] border border-[#174C3B]/30 hover:bg-[#FAF6EF] rounded-xl transition-colors whitespace-nowrap shrink-0 cursor-pointer"
           >
             Request Security Whitepaper
           </button>
