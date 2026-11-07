@@ -2,6 +2,7 @@
 
 import { Navbar } from '@/components/Navbar';
 import { Hero } from '@/components/landing/Hero';
+import { CreatorQuote } from '@/components/landing/CreatorQuote';
 import { FeatureTabs } from '@/components/landing/FeatureTabs';
 import { ComparisonTable } from '@/components/landing/ComparisonTable';
 import { PricingSection } from '@/components/landing/PricingSection';
@@ -14,6 +15,8 @@ export default function HomePage() {
 
       <main id="main-content" tabIndex={-1} className="space-y-20 md:space-y-28 focus:outline-none">
         <Hero />
+
+        <CreatorQuote />
 
         <section id="features" aria-label="Core Capabilities" className="scroll-mt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FeatureTabs />

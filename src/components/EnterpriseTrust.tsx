@@ -63,22 +63,25 @@ export function EnterpriseTrust() {
           })}
         </div>
 
-        {/* Enterprise Testimonial / Proof Quote */}
-        <div className="mt-12 bg-[#FCFAF5] border border-[#E8DFD0] rounded-2xl p-7 sm:p-10 max-w-4xl mx-auto">
-          <blockquote className="text-base sm:text-lg text-[#242820] font-normal leading-relaxed text-center italic">
-            &ldquo;Before Markwise, our legal review queue for product launches took 11 business days, and brand copywriters felt constantly second-guessed. Markwise replaced endless email threads with clear evidence-backed explanations. Our approval cycle dropped to 4 hours.&rdquo;
+        {/* Founder Architecture Statement / Proof Quote */}
+        <div className="mt-12 bg-[#FCFAF5] dark:bg-white/5 border border-[#E8DFD0] dark:border-[#235A4A] rounded-2xl p-7 sm:p-10 max-w-4xl mx-auto shadow-xs">
+          <blockquote className="text-base sm:text-lg text-[#242820] dark:text-[#F7F2E8] font-normal leading-relaxed text-center italic">
+            &ldquo;Markwise was built to solve a real enterprise problem: moving brand governance from static PDFs to living, executable code. The interactive sandbox you see above is the exact workflow we deployed to production.&rdquo;
           </blockquote>
           <div className="mt-6 flex flex-col items-center justify-center text-center">
+            <div className="w-11 h-11 rounded-full bg-[#123B2F] text-white flex items-center justify-center font-bold text-sm shadow-2xs mb-2 border-2 border-[#F47745]/40">
+              MK
+            </div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-sm text-[#242820]">
-                Eleanor Vance
+              <span className="font-bold text-sm text-[#242820] dark:text-white">
+                Manish Kumbhar
               </span>
-              <span className="text-[10px] font-mono uppercase tracking-wider font-semibold bg-[#EAE5DA] text-[#5A6355] px-2 py-0.5 rounded border border-[#D8CFC0]">
-                [Illustrative Example]
+              <span className="text-[10px] font-mono uppercase tracking-wider font-semibold bg-[#123B2F]/10 dark:bg-white/10 text-[#123B2F] dark:text-[#CBD5C0] px-2 py-0.5 rounded border border-[#123B2F]/20 dark:border-white/20">
+                Creator
               </span>
             </div>
-            <span className="text-xs text-[#545B4E] mt-0.5">
-              VP of Global Communications & Brand Protection, Apex Health Technologies
+            <span className="text-xs text-[#545B4E] dark:text-[#CBD5C0] mt-0.5">
+              Creator of Markwise
             </span>
           </div>
         </div>
