@@ -12,6 +12,7 @@ import {
   Loader2,
   RotateCcw,
 } from 'lucide-react';
+import { ToastNotification } from './ui/toast';
 
 interface HeroDashboardMockupProps {
   onAcceptFix?: () => void;
@@ -26,6 +27,7 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [hasRunReview, setHasRunReview] = useState(false);
   const [isAccepted, setIsAccepted] = useState(false);
+  const [showCorrectionToast, setShowCorrectionToast] = useState(false);
 
   const handleRunReview = () => {
     setIsLoading(true);
@@ -39,6 +41,7 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
   const handleApplyFix = () => {
     setIsAccepted(true);
     setInputText(FIXED_DEMO_TEXT);
+    setShowCorrectionToast(true);
     if (onAcceptFix) {
       onAcceptFix();
     }
@@ -48,6 +51,7 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
     setInputText(DEFAULT_DEMO_TEXT);
     setHasRunReview(false);
     setIsAccepted(false);
+    setShowCorrectionToast(false);
   };
 
   const wordCount = inputText.trim() ? inputText.trim().split(/\s+/).length : 0;
@@ -393,6 +397,15 @@ export function HeroDashboardMockup({ onAcceptFix }: HeroDashboardMockupProps) {
           </div>
         </div>
       </div>
+
+      {/* Correction Memory Toast Notification */}
+      <ToastNotification
+        show={showCorrectionToast}
+        onClose={() => setShowCorrectionToast(false)}
+        title="Correction Saved to Brand Brain"
+        description="Markwise will learn from this human review to flag similar issues automatically."
+        tag="Continuous Learning · Loop Step 09"
+      />
     </div>
   );
 }
