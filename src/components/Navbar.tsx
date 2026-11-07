@@ -46,64 +46,81 @@ export function Navbar({}: NavbarProps = {}) {
             </span>
           </Link>
 
-          {/* Center: Main Nav Links (The Loop, Features, Pricing) */}
+          {/* Center: Main Nav Links */}
           <nav
             aria-label="Main Navigation"
             className="hidden md:flex items-center gap-6 lg:gap-8"
           >
-            <a
-              href="#loop"
-              className="text-xs sm:text-sm font-medium text-[#545B4E] dark:text-[#CBD5C0] hover:text-[#123B2F] dark:hover:text-white transition-colors cursor-pointer"
-            >
-              The Loop
-            </a>
-
-            {/* Features with Dropdown */}
+            {/* Product Dropdown */}
             <div className="relative group">
-              <span className="absolute -top-3.5 right-1 bg-[#123B2F] dark:bg-[#F47745] text-white text-[8px] font-bold px-1.5 py-0.2 rounded-full uppercase tracking-wider shadow-2xs">
-                New
+              <span className="absolute -top-3.5 right-1 bg-brand-forest dark:bg-brand-coral text-white text-[8px] font-bold px-1.5 py-0.2 rounded-full uppercase tracking-wider shadow-2xs">
+                Platform
               </span>
-              <a
-                href="/#features"
-                className="text-xs sm:text-sm font-medium text-[#545B4E] dark:text-[#CBD5C0] hover:text-[#123B2F] dark:hover:text-white transition-colors cursor-pointer inline-flex items-center gap-1 py-1"
+              <button
+                type="button"
+                className="text-xs sm:text-sm font-medium text-[#545B4E] dark:text-[#CBD5C0] hover:text-[#123B2F] dark:hover:text-white transition-colors cursor-pointer inline-flex items-center gap-1 py-1 focus:outline-none"
               >
-                <span>Features</span>
+                <span>Product</span>
                 <ChevronDown aria-hidden="true" className="w-3 h-3 text-[#7A8274] dark:text-[#CBD5C0] group-hover:rotate-180 transition-transform duration-200" />
-              </a>
+              </button>
 
               {/* Dropdown Menu */}
               <div className="absolute top-full -left-4 pt-2 hidden group-hover:block z-50">
-                <div className="w-56 bg-white dark:bg-[#164638] rounded-xl border border-[#E8DFD0] dark:border-[#235A4A] shadow-lg p-2 space-y-1">
-                  <Link
-                    href="/#features"
-                    className="block px-3 py-2 rounded-lg text-xs font-medium text-[#242820] dark:text-[#F7F2E8] hover:bg-[#FAF6EF] dark:hover:bg-white/10 transition-colors"
-                  >
-                    <div className="font-semibold text-[#123B2F] dark:text-white">Core Capabilities</div>
-                    <div className="text-[10px] text-[#7A8274] dark:text-[#CBD5C0]">Brand Brain &amp; Fact Vault</div>
-                  </Link>
+                <div className="w-64 bg-white dark:bg-[#164638] rounded-2xl border border-[#E8DFD0] dark:border-[#235A4A] shadow-xl p-2 space-y-1">
                   <Link
                     href="/how-it-works"
-                    className="block px-3 py-2 rounded-lg text-xs font-medium text-[#242820] dark:text-[#F7F2E8] hover:bg-[#FAF6EF] dark:hover:bg-white/10 transition-colors"
+                    className="block px-3 py-2 rounded-xl text-xs font-medium text-[#242820] dark:text-[#F7F2E8] hover:bg-[#FAF6EF] dark:hover:bg-white/10 transition-colors"
                   >
                     <div className="font-semibold text-[#123B2F] dark:text-white flex items-center justify-between">
-                      <span>How it works</span>
-                      <span className="text-[9px] text-[#F47745] font-mono">10 Steps</span>
+                      <span>How It Works</span>
+                      <span className="text-[9px] text-[#F47745] font-mono font-bold bg-[#F47745]/10 px-1.5 py-0.2 rounded">10 Steps</span>
                     </div>
-                    <div className="text-[10px] text-[#7A8274] dark:text-[#CBD5C0]">The Markwise Loop &amp; Flow</div>
+                    <div className="text-[10px] text-[#7A8274] dark:text-[#CBD5C0] mt-0.5">The continuous governance loop &amp; flow</div>
                   </Link>
+
                   <Link
                     href="/trust"
-                    className="block px-3 py-2 rounded-lg text-xs font-medium text-[#242820] dark:text-[#F7F2E8] hover:bg-[#FAF6EF] dark:hover:bg-white/10 transition-colors"
+                    className="block px-3 py-2 rounded-xl text-xs font-medium text-[#242820] dark:text-[#F7F2E8] hover:bg-[#FAF6EF] dark:hover:bg-white/10 transition-colors"
                   >
                     <div className="font-semibold text-[#123B2F] dark:text-white flex items-center justify-between">
                       <span>Trust Center</span>
-                      <span className="text-[9px] text-emerald-700 dark:text-emerald-300 font-mono">Verified</span>
+                      <span className="text-[9px] text-emerald-700 dark:text-emerald-300 font-mono font-bold bg-emerald-100 dark:bg-emerald-950/60 px-1.5 py-0.2 rounded">Verified</span>
                     </div>
-                    <div className="text-[10px] text-[#7A8274] dark:text-[#CBD5C0]">Security &amp; Zero Training</div>
+                    <div className="text-[10px] text-[#7A8274] dark:text-[#CBD5C0] mt-0.5">Security, privacy &amp; zero training</div>
+                  </Link>
+
+                  <Link
+                    href="/#features"
+                    className="block px-3 py-2 rounded-xl text-xs font-medium text-[#242820] dark:text-[#F7F2E8] hover:bg-[#FAF6EF] dark:hover:bg-white/10 transition-colors"
+                  >
+                    <div className="font-semibold text-[#123B2F] dark:text-white">Core Capabilities</div>
+                    <div className="text-[10px] text-[#7A8274] dark:text-[#CBD5C0] mt-0.5">Brand Brain, Fact Vault &amp; Codex</div>
+                  </Link>
+
+                  <Link
+                    href="/docs"
+                    className="block px-3 py-2 rounded-xl text-xs font-medium text-[#242820] dark:text-[#F7F2E8] hover:bg-[#FAF6EF] dark:hover:bg-white/10 transition-colors"
+                  >
+                    <div className="font-semibold text-[#123B2F] dark:text-white">Architecture Docs</div>
+                    <div className="text-[10px] text-[#7A8274] dark:text-[#CBD5C0] mt-0.5">Living rule YAML syntax &amp; APIs</div>
                   </Link>
                 </div>
               </div>
             </div>
+
+            <Link
+              href="/how-it-works"
+              className="text-xs sm:text-sm font-medium text-[#545B4E] dark:text-[#CBD5C0] hover:text-[#123B2F] dark:hover:text-white transition-colors cursor-pointer"
+            >
+              How It Works
+            </Link>
+
+            <Link
+              href="/trust"
+              className="text-xs sm:text-sm font-medium text-[#545B4E] dark:text-[#CBD5C0] hover:text-[#123B2F] dark:hover:text-white transition-colors cursor-pointer"
+            >
+              Trust Center
+            </Link>
 
             <a
               href="#pricing"
