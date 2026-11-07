@@ -23,6 +23,8 @@ import LoginPage from './app/login/page';
 import DocsPage from './app/docs/page';
 import PrivacyPolicyPage from './app/privacy/page';
 import TermsOfServicePage from './app/terms/page';
+import TrustCenterPage from './app/trust/page';
+import HowItWorksPage from './app/how-it-works/page';
 import NotFoundPage from './app/not-found';
 import { createClient } from '@/utils/supabase/client';
 import { ActiveTab } from './utils/governance';
@@ -128,6 +130,26 @@ export default function App() {
       <ThemeProvider>
         <ErrorBoundary>
           <TermsOfServicePage />
+        </ErrorBoundary>
+      </ThemeProvider>
+    );
+  }
+
+  if (currentPath === '/trust') {
+    return (
+      <ThemeProvider>
+        <ErrorBoundary>
+          <TrustCenterPage />
+        </ErrorBoundary>
+      </ThemeProvider>
+    );
+  }
+
+  if (currentPath === '/how-it-works') {
+    return (
+      <ThemeProvider>
+        <ErrorBoundary>
+          <HowItWorksPage />
         </ErrorBoundary>
       </ThemeProvider>
     );

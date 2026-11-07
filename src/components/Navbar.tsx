@@ -58,18 +58,51 @@ export function Navbar({}: NavbarProps = {}) {
               The Loop
             </a>
 
-            {/* Features with "New" Badge */}
-            <div className="relative">
+            {/* Features with Dropdown */}
+            <div className="relative group">
               <span className="absolute -top-3.5 right-1 bg-[#123B2F] dark:bg-[#F47745] text-white text-[8px] font-bold px-1.5 py-0.2 rounded-full uppercase tracking-wider shadow-2xs">
                 New
               </span>
               <a
-                href="#features"
-                className="text-xs sm:text-sm font-medium text-[#545B4E] dark:text-[#CBD5C0] hover:text-[#123B2F] dark:hover:text-white transition-colors cursor-pointer inline-flex items-center gap-1"
+                href="/#features"
+                className="text-xs sm:text-sm font-medium text-[#545B4E] dark:text-[#CBD5C0] hover:text-[#123B2F] dark:hover:text-white transition-colors cursor-pointer inline-flex items-center gap-1 py-1"
               >
                 <span>Features</span>
-                <ChevronDown className="w-3 h-3 text-[#7A8274] dark:text-[#CBD5C0]" />
+                <ChevronDown className="w-3 h-3 text-[#7A8274] dark:text-[#CBD5C0] group-hover:rotate-180 transition-transform duration-200" />
               </a>
+
+              {/* Dropdown Menu */}
+              <div className="absolute top-full -left-4 pt-2 hidden group-hover:block z-50">
+                <div className="w-56 bg-white dark:bg-[#164638] rounded-xl border border-[#E8DFD0] dark:border-[#235A4A] shadow-lg p-2 space-y-1">
+                  <Link
+                    href="/#features"
+                    className="block px-3 py-2 rounded-lg text-xs font-medium text-[#242820] dark:text-[#F7F2E8] hover:bg-[#FAF6EF] dark:hover:bg-white/10 transition-colors"
+                  >
+                    <div className="font-semibold text-[#123B2F] dark:text-white">Core Capabilities</div>
+                    <div className="text-[10px] text-[#7A8274] dark:text-[#CBD5C0]">Brand Brain &amp; Fact Vault</div>
+                  </Link>
+                  <Link
+                    href="/how-it-works"
+                    className="block px-3 py-2 rounded-lg text-xs font-medium text-[#242820] dark:text-[#F7F2E8] hover:bg-[#FAF6EF] dark:hover:bg-white/10 transition-colors"
+                  >
+                    <div className="font-semibold text-[#123B2F] dark:text-white flex items-center justify-between">
+                      <span>How it works</span>
+                      <span className="text-[9px] text-[#F47745] font-mono">10 Steps</span>
+                    </div>
+                    <div className="text-[10px] text-[#7A8274] dark:text-[#CBD5C0]">The Markwise Loop &amp; Flow</div>
+                  </Link>
+                  <Link
+                    href="/trust"
+                    className="block px-3 py-2 rounded-lg text-xs font-medium text-[#242820] dark:text-[#F7F2E8] hover:bg-[#FAF6EF] dark:hover:bg-white/10 transition-colors"
+                  >
+                    <div className="font-semibold text-[#123B2F] dark:text-white flex items-center justify-between">
+                      <span>Trust Center</span>
+                      <span className="text-[9px] text-emerald-700 dark:text-emerald-300 font-mono">Verified</span>
+                    </div>
+                    <div className="text-[10px] text-[#7A8274] dark:text-[#CBD5C0]">Security &amp; Zero Training</div>
+                  </Link>
+                </div>
+              </div>
             </div>
 
             <a
@@ -157,16 +190,34 @@ export function Navbar({}: NavbarProps = {}) {
             >
               The Loop
             </a>
-            <a
-              href="#features"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-left py-1.5 hover:text-[#123B2F] dark:hover:text-white transition-colors cursor-pointer flex items-center justify-between"
-            >
-              <span>Features</span>
-              <span className="bg-[#123B2F] dark:bg-[#F47745] text-white text-[8px] font-bold px-1.5 py-0.2 rounded-full uppercase">
-                New
-              </span>
-            </a>
+            <div className="py-1 space-y-1">
+              <a
+                href="/#features"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-left py-1 hover:text-[#123B2F] dark:hover:text-white transition-colors cursor-pointer flex items-center justify-between font-semibold"
+              >
+                <span>Features</span>
+                <span className="bg-[#123B2F] dark:bg-[#F47745] text-white text-[8px] font-bold px-1.5 py-0.2 rounded-full uppercase">
+                  New
+                </span>
+              </a>
+              <div className="pl-3 border-l border-[#E8DFD0] dark:border-[#235A4A] space-y-1 mt-1">
+                <Link
+                  href="/how-it-works"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block py-1 text-xs text-[#545B4E] dark:text-[#CBD5C0] hover:text-[#123B2F] dark:hover:text-white"
+                >
+                  How it works (10-Step Loop)
+                </Link>
+                <Link
+                  href="/trust"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block py-1 text-xs text-[#545B4E] dark:text-[#CBD5C0] hover:text-[#123B2F] dark:hover:text-white"
+                >
+                  Trust Center &amp; Security
+                </Link>
+              </div>
+            </div>
             <a
               href="#pricing"
               onClick={() => setMobileMenuOpen(false)}

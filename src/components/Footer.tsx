@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Shield } from 'lucide-react';
 import { ActiveTab } from '../utils/governance';
 
@@ -47,6 +48,14 @@ export function Footer({
               Platform
             </span>
             <ul className="space-y-2">
+              <li>
+                <Link
+                  href="/how-it-works"
+                  className="hover:text-[#174C3B] font-semibold text-[#174C3B] transition-colors cursor-pointer text-left block"
+                >
+                  How it Works (10-Step Loop)
+                </Link>
+              </li>
               <li>
                 <button
                   type="button"
@@ -137,6 +146,14 @@ export function Footer({
               Compliance
             </span>
             <ul className="space-y-2 text-[11px] text-[#7A8274]">
+              <li>
+                <Link
+                  href="/trust"
+                  className="font-semibold text-[#174C3B] hover:underline transition-colors block"
+                >
+                  Markwise Trust Center &rarr;
+                </Link>
+              </li>
               <li>Designed for SOC 2 Compliance</li>
               <li>ISO 27001 Security Management</li>
               <li>Zero Data Retention (ZDR)</li>
@@ -152,27 +169,30 @@ export function Footer({
             &copy; {new Date().getFullYear()} Markwise Technologies Inc. All rights reserved.
           </div>
           <div className="flex items-center gap-6">
-            <button
-              type="button"
-              onClick={() => {
-                window.history.pushState({}, '', '/privacy');
-                window.dispatchEvent(new PopStateEvent('popstate'));
-              }}
+            <Link
+              href="/how-it-works"
+              className="text-[#7A8274] hover:text-[#174C3B] hover:underline cursor-pointer"
+            >
+              How It Works
+            </Link>
+            <Link
+              href="/trust"
+              className="text-[#7A8274] hover:text-[#174C3B] hover:underline cursor-pointer"
+            >
+              Trust Center
+            </Link>
+            <Link
+              href="/privacy"
               className="text-[#7A8274] hover:text-[#174C3B] hover:underline cursor-pointer"
             >
               Privacy Policy
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                window.history.pushState({}, '', '/terms');
-                window.dispatchEvent(new PopStateEvent('popstate'));
-              }}
+            </Link>
+            <Link
+              href="/terms"
               className="text-[#7A8274] hover:text-[#174C3B] hover:underline cursor-pointer"
             >
               Terms of Service
-            </button>
-            <span className="text-[#7A8274]">Security Trust Center</span>
+            </Link>
           </div>
         </div>
       </div>
