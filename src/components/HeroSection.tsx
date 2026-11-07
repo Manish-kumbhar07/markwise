@@ -90,7 +90,7 @@ export function HeroSection({}: HeroSectionProps = {}) {
 
             <div className="pt-4">
               <span className="text-[10px] font-bold tracking-widest text-[#7C8875] dark:text-[#CBD5C0] uppercase block">
-                TRUSTED BY LEADING ENTERPRISES IN
+                BUILT FOR TEAMS IN FINANCE, HEALTHCARE, AND TECH
               </span>
               <div className="flex items-center gap-2 flex-wrap mt-2">
                 {['FINANCE', 'HEALTHCARE', 'ENTERPRISE SAAS', 'TECH'].map((tag) => (

@@ -137,11 +137,11 @@ export function Footer({
               Compliance
             </span>
             <ul className="space-y-2 text-[11px] text-[#7A8274]">
-              <li>SOC 2 Type II Certified</li>
+              <li>Designed for SOC 2 Compliance</li>
               <li>ISO 27001 Security Management</li>
               <li>Zero Data Retention (ZDR)</li>
               <li>GDPR / CCPA / HIPAA Ready</li>
-              <li>99.99% Enterprise SLA</li>
+              <li>Target 99.9% Availability (Pilot Phase)</li>
             </ul>
           </div>
         </div>

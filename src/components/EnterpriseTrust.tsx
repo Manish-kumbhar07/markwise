@@ -4,8 +4,8 @@ export function EnterpriseTrust() {
   const trustCards = [
     {
       icon: ShieldCheck,
-      title: 'SOC 2 Type II Certified',
-      description: 'Annual independent third-party audits verifying our security, availability, and confidential data processing practices.',
+      title: 'Designed for SOC 2 Compliance',
+      description: 'Enterprise security architecture, data isolation, and comprehensive audit trails aligned with SOC 2 Trust Services Criteria.',
     },
     {
       icon: Database,
@@ -69,9 +69,14 @@ export function EnterpriseTrust() {
             &ldquo;Before Markwise, our legal review queue for product launches took 11 business days, and brand copywriters felt constantly second-guessed. Markwise replaced endless email threads with clear evidence-backed explanations. Our approval cycle dropped to 4 hours.&rdquo;
           </blockquote>
           <div className="mt-6 flex flex-col items-center justify-center text-center">
-            <span className="font-bold text-sm text-[#242820]">
-              Eleanor Vance
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-sm text-[#242820]">
+                Eleanor Vance
+              </span>
+              <span className="text-[10px] font-mono uppercase tracking-wider font-semibold bg-[#EAE5DA] text-[#5A6355] px-2 py-0.5 rounded border border-[#D8CFC0]">
+                [Illustrative Example]
+              </span>
+            </div>
             <span className="text-xs text-[#545B4E] mt-0.5">
               VP of Global Communications & Brand Protection, Apex Health Technologies
             </span>

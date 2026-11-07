@@ -193,7 +193,7 @@ export function GetStartedModal({ isOpen, onClose }: GetStartedModalProps) {
             <div className="p-3 bg-white rounded-xl border border-[#E8DFD0] text-xs text-left space-y-1">
               <span className="font-semibold text-[#174C3B] block">Next Steps:</span>
               <p className="text-[#545B4E]">
-                1. Dedicated sandbox environment provisioned with SOC 2 credentials.
+                1. Dedicated sandbox environment provisioned with enterprise security controls.
               </p>
               <p className="text-[#545B4E]">
                 2. Automated import of your first 20 living brand compliance rules.

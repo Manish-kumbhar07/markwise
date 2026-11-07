@@ -207,7 +207,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
         {/* Security / Compliance Footer */}
         <div className="mt-5 pt-4 border-t border-[#E8DFD0] flex items-center justify-center gap-1.5 text-[11px] text-[#7A8274]">
           <Lock className="w-3.5 h-3.5 text-[#174C3B]" />
-          <span>Encrypted with TLS 1.3 · SOC 2 Type II Audited</span>
+          <span>Encrypted with TLS 1.3 · Designed for SOC 2</span>
         </div>
       </div>
     </div>

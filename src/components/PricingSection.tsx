@@ -44,7 +44,7 @@ const PLANS: PricingPlan[] = [
       'Okta, Azure AD & Google SAML SSO',
       'Tamper-proof Staging Drift Prevention',
       'Dedicated Brand Policy Architect',
-      '99.99% Availability SLA with Financial Credits',
+      'Target 99.9% Availability (Pilot Phase)',
     ],
   },
   {
